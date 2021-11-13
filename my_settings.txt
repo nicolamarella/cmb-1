@@ -1,0 +1,30 @@
+Scenario.name = MyScenario
+Scenario.endTime = 600
+
+# the bigger, the faster, but less granulatiry
+Scenario.updateInterval = 0.1
+
+# somewhat important - enabled for myInterface.transmitRange, shows when 2 devices can "tank"
+Scenario.simulateConnections = true
+Scenario.nrofHostGroups = 0
+
+# we might want to remove this when passing a map?
+MovementModel.worldSize = 1000,1000
+Report.nrofReports = 0
+Events.nrof = 0
+
+# Adding groups
+Scenario.nrofHostGroups = 1
+
+### Group 1
+Group1.groupID = x
+Group1.nrofHosts = 10
+Group1.nrofInterfaces = 1
+Group1.interface1 = myInterface
+myInterface.type = SimpleBroadcastInterface
+
+# 50 meters range
+myInterface.transmitRange = 50
+myInterface.transmitSpeed = 0
+Group1.movementModel = RandomWaypoint
+Group1.router = PassiveRouter

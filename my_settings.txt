@@ -26,5 +26,5 @@ myInterface.type = SimpleBroadcastInterface
 # 50 meters range
 myInterface.transmitRange = 50
 myInterface.transmitSpeed = 0
-Group1.movementModel = RandomWaypoint
+Group1.movementModel = TimeVariantRwp
 Group1.router = PassiveRouter

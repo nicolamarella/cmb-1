@@ -69,7 +69,7 @@ extends MovementModel {
 
 
   //==========================================================================//
-  // Construction
+  // Construction - One instance PER group
   //==========================================================================//
   public TimeVariantRwp( final Settings settings ) {
     super( settings );

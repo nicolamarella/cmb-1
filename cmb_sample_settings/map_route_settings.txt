@@ -27,6 +27,7 @@ Group1.router = PassiveRouter
 ## Map based movement -movement model specific settings
 MapBasedMovement.nrofMapFiles = 2
 MapBasedMovement.mapFile1 = data/cluster/ferryroute.wkt
+# used only to shift a bit the map down right - nothing more
 MapBasedMovement.mapFile2 = data/cluster/origin.wkt
 
 # Reports

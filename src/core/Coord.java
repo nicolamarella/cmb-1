@@ -14,15 +14,17 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Constructor.
+	 * 
 	 * @param x Initial X-coordinate
 	 * @param y Initial Y-coordinate
 	 */
 	public Coord(double x, double y) {
-		setLocation(x,y);
+		setLocation(x, y);
 	}
 
 	/**
 	 * Sets the location of this coordinate object
+	 * 
 	 * @param x The x coordinate to set
 	 * @param y The y coordinate to set
 	 */
@@ -34,6 +36,7 @@ public class Coord implements Cloneable, Comparable<Coord> {
 	/**
 	 * Sets this coordinate's location to be equal to other
 	 * coordinates location
+	 * 
 	 * @param c The other coordinate
 	 */
 	public void setLocation(Coord c) {
@@ -43,6 +46,7 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Moves the point by dx and dy
+	 * 
 	 * @param dx How much to move the point in X-direction
 	 * @param dy How much to move the point in Y-direction
 	 */
@@ -53,6 +57,7 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Returns the distance to another coordinate
+	 * 
 	 * @param other The other coordinate
 	 * @return The distance between this and another coordinate
 	 */
@@ -60,11 +65,12 @@ public class Coord implements Cloneable, Comparable<Coord> {
 		double dx = this.x - other.x;
 		double dy = this.y - other.y;
 
-		return Math.sqrt(dx*dx + dy*dy);
+		return Math.sqrt(dx * dx + dy * dy);
 	}
 
 	/**
 	 * Returns the x coordinate
+	 * 
 	 * @return x coordinate
 	 */
 	public double getX() {
@@ -73,6 +79,7 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Returns the y coordinate
+	 * 
 	 * @return y coordinate
 	 */
 	public double getY() {
@@ -81,10 +88,11 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Returns a text representation of the coordinate (rounded to 2 decimals)
+	 * 
 	 * @return a text representation of the coordinate
 	 */
 	public String toString() {
-		return String.format("(%.2f,%.2f)",x,y);
+		return String.format("(%.14f,%.14f)", x, y);
 	}
 
 	/**
@@ -103,21 +111,22 @@ public class Coord implements Cloneable, Comparable<Coord> {
 
 	/**
 	 * Checks if this coordinate's location is equal to other coordinate's
+	 * 
 	 * @param c The other coordinate
 	 * @return True if locations are the same
 	 */
 	public boolean equals(Coord c) {
 		if (c == this) {
 			return true;
-		}
-		else {
+		} else {
 			return (x == c.x && y == c.y); // XXX: == for doubles...
 		}
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null) return false;
+		if (o == null)
+			return false;
 		return equals((Coord) o);
 	}
 
@@ -126,30 +135,27 @@ public class Coord implements Cloneable, Comparable<Coord> {
 	 * (actually a hash of the String made of the coordinates)
 	 */
 	public int hashCode() {
-		return (x+","+y).hashCode();
+		return (x + "," + y).hashCode();
 	}
 
 	/**
 	 * Compares this coordinate to other coordinate. Coordinate whose y
 	 * value is smaller comes first and if y values are equal, the one with
 	 * smaller x value comes first.
+	 * 
 	 * @return -1, 0 or 1 if this node is before, in the same place or
-	 * after the other coordinate
+	 *         after the other coordinate
 	 */
 	public int compareTo(Coord other) {
 		if (this.y < other.y) {
 			return -1;
-		}
-		else if (this.y > other.y) {
+		} else if (this.y > other.y) {
 			return 1;
-		}
-		else if (this.x < other.x) {
+		} else if (this.x < other.x) {
 			return -1;
-		}
-		else if (this.x > other.x) {
+		} else if (this.x > other.x) {
 			return 1;
-		}
-		else {
+		} else {
 			return 0;
 		}
 	}

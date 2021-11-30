@@ -20,14 +20,24 @@ Group1.nrofHosts = 1
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
 Group1.movementModel = MapRouteMovement
-Group1.routeFile = data/cluster/ferryroute.wkt
+Group1.routeFile = data/fmi/cleaned/fmi.wkt
 Group1.routeType = 1
 Group1.router = PassiveRouter
 
 ## Map based movement -movement model specific settings
-MapBasedMovement.nrofMapFiles = 2
-MapBasedMovement.mapFile1 = data/cluster/ferryroute.wkt
-MapBasedMovement.mapFile2 = data/cluster/origin.wkt
+MapBasedMovement.nrofMapFiles = 1
+MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
+# used only to shift a bit the map down right - nothing more
+#MapBasedMovement.mapFile2 = data/cluster/origin.wkt
+
+# GUI underlay image settings
+GUI.UnderlayImage.fileName = data/fmi/cleaned/background.png
+# Image offset in pixels (x, y)
+GUI.UnderlayImage.offset = -105,-60
+# Scaling factor for the image
+GUI.UnderlayImage.scale = 0.315
+# Image rotation (radians)
+GUI.UnderlayImage.rotate = 0.0
 
 # Reports
 Report.nrofReports = 1

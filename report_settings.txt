@@ -1,0 +1,17 @@
+#Content of this file can be included in "group_16.txt" when finished
+
+Report.reportDir = reports
+Report.warmup = 200
+Report.nrofReports = 3
+
+Report.report1 = NodeDensityReport
+NodeDensityReport.xCount = 10
+NodeDensityReport.yCount = 10
+NodeDensityReport.outputGnuplot = true
+NodeDensityReport.onlyAverage = true
+
+Report.report2 = ContactTimesReport
+ContactTimesReport.granularity = 100
+
+Report.report3 = InterContactTimesReport
+InterContactTimesReport.granularity = 100

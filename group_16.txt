@@ -40,7 +40,3 @@ GUI.UnderlayImage.scale = 0.315
 GUI.UnderlayImage.rotate = 0.0
 
 # Reports
-Report.nrofReports = 1
-Report.report1 = FlightLengthReport
-
-Report.reportDir = reports

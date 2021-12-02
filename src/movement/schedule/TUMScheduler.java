@@ -131,6 +131,11 @@ public class TUMScheduler implements Serializable {
 		System.out.println("Max number of schedule is " + maxSchedules);
 	}
 
+	public ArrayList<Student> getStudents() {
+		return students;
+
+	}
+
 	/**
 	 * Returns a String representation of the TUM schedule
 	 * 

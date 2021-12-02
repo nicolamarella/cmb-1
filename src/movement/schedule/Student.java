@@ -2,6 +2,8 @@ package movement.schedule;
 
 import java.util.ArrayList;
 
+import core.DTNHost;
+
 /**
  * Act as a proxy/holder for DNTNode
  * Useful to abstract away students while creating schedules
@@ -11,6 +13,15 @@ public class Student {
 
     private ArrayList<TUMRoomSchedule> schedule = new ArrayList<>();
     private boolean hasOverlappingCourses = false;
+    private DTNHost host;
+
+    public void setDTNHost(DTNHost host) {
+        this.host = host;
+    }
+
+    public DTNHost getDTNHost() {
+        return this.host;
+    }
 
     public boolean hasOverlappingCourses() {
         return hasOverlappingCourses;

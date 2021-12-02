@@ -18,9 +18,9 @@ public class ProphetRouterTest extends AbstractRouterTest {
 	@Override
 	public void setUp() throws Exception {
 		ts.setNameSpace(null);
-		ts.putSetting(MessageRouter.B_SIZE_S, ""+BUFFER_SIZE);
+		ts.putSetting(MessageRouter.B_SIZE_S, "" + BUFFER_SIZE);
 		ts.putSetting(ProphetRouter.PROPHET_NS + "." +
-				ProphetRouter.SECONDS_IN_UNIT_S , SECONDS_IN_TIME_UNIT+"");
+				ProphetRouter.SECONDS_IN_UNIT_S, SECONDS_IN_TIME_UNIT + "");
 		setRouterProto(new ProphetRouter(ts));
 		super.setUp();
 	}
@@ -29,21 +29,21 @@ public class ProphetRouterTest extends AbstractRouterTest {
 	 * Tests normal routing
 	 */
 	public void testRouting() {
-		Message m1 = new Message(h1,h2, msgId2, 1);
+		Message m1 = new Message(h1, h2, msgId2, 1);
 		h1.createNewMessage(m1);
-		Message m2 = new Message(h1,h3, msgId3, 1);
+		Message m2 = new Message(h1, h3, msgId3, 1);
 		h1.createNewMessage(m2);
-		Message m3 = new Message(h1,h4, msgId4, 1);
+		Message m3 = new Message(h1, h4, msgId4, 1);
 		h1.createNewMessage(m3);
-		Message m4 = new Message(h1,h6, "dummy", 1); // this message should not be fwded
+		Message m4 = new Message(h1, h6, "dummy", 1); // this message should not be fwded
 		h1.createNewMessage(m4);
-		Message m5 = new Message(h1,h5, msgId5, 1);
+		Message m5 = new Message(h1, h5, msgId5, 1);
 		h1.createNewMessage(m5);
-		Message m6 = new Message(h4,h1, "d1", 1);
+		Message m6 = new Message(h4, h1, "d1", 1);
 		h4.createNewMessage(m6);
 
-		ProphetRouter r4 = (ProphetRouter)h4.getRouter();
-		ProphetRouter r5 = (ProphetRouter)h5.getRouter();
+		ProphetRouter r4 = (ProphetRouter) h4.getRouter();
+		ProphetRouter r5 = (ProphetRouter) h5.getRouter();
 
 		checkCreates(6);
 
@@ -129,8 +129,8 @@ public class ProphetRouterTest extends AbstractRouterTest {
 	}
 
 	public void testAging() {
-		ProphetRouter r4 = (ProphetRouter)h4.getRouter();
-		ProphetRouter r5 = (ProphetRouter)h5.getRouter();
+		ProphetRouter r4 = (ProphetRouter) h4.getRouter();
+		ProphetRouter r5 = (ProphetRouter) h5.getRouter();
 
 		h4.connect(h5);
 		assertEquals(ProphetRouter.P_INIT, r4.getPredFor(h5));
@@ -139,13 +139,13 @@ public class ProphetRouterTest extends AbstractRouterTest {
 		disconnect(h5);
 
 		clock.advance(SECONDS_IN_TIME_UNIT * 2);
-		double newPred = ProphetRouter.P_INIT * Math.pow(ProphetRouter.GAMMA,2);
+		double newPred = ProphetRouter.P_INIT * Math.pow(ProphetRouter.DEFAULT_GAMMA, 2);
 
 		assertEquals(newPred, r4.getPredFor(h5));
 		assertEquals(newPred, r5.getPredFor(h4));
 
 		clock.advance(SECONDS_IN_TIME_UNIT / 10);
-		newPred = newPred *	Math.pow(ProphetRouter.GAMMA, 1.0/10);
+		newPred = newPred * Math.pow(ProphetRouter.DEFAULT_GAMMA, 1.0 / 10);
 
 		assertEquals(newPred, r4.getPredFor(h5));
 		assertEquals(newPred, r5.getPredFor(h4));

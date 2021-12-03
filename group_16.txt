@@ -4,7 +4,7 @@ Scenario.name = MapRouteMovement
 Scenario.endTime = 6000
 Scenario.updateInterval = 0.1
 Scenario.simulateConnections = false
-MovementModel.worldSize = 1000,1000
+MovementModel.worldSize = 500,500
 Events.nrof = 0
 
 # Communication Interface
@@ -19,16 +19,15 @@ Group1.groupID = x
 Group1.nrofHosts = 1
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
-Group1.movementModel = MapRouteMovement
-Group1.routeFile = data/fmi/cleaned/fmi.wkt
-Group1.routeType = 1
+Group1.movementModel = TUMScheduleMovement 
 Group1.router = PassiveRouter
+# Group1.pois = 1,1
 
 ## Map based movement -movement model specific settings
 MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
-# used only to shift a bit the map down right - nothing more
-#MapBasedMovement.mapFile2 = data/cluster/origin.wkt
+# Use second file for initial coordinates
+# PointsOfInterest.poiFile1 = data/fmi/cleaned/StartingPoints.wkt
 
 # GUI underlay image settings
 GUI.UnderlayImage.fileName = data/fmi/cleaned/background.png

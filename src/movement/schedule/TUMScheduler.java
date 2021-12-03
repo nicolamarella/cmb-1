@@ -65,8 +65,6 @@ public class TUMScheduler implements Serializable {
 			while ((values = csvReader.readNext()) != null) {
 				TUMRoomSchedule schedule = new TUMRoomSchedule(values);
 				this.roomSchedules.add(schedule);
-				System.out.println("Printing loaded CSV schedule");
-				System.out.println(schedule);
 			}
 
 		} catch (FileNotFoundException fnfe) {
@@ -120,9 +118,6 @@ public class TUMScheduler implements Serializable {
 			}
 			if (s.getSchedule().size() < minSchedules) {
 				minSchedules = s.getSchedule().size();
-			}
-			if (s.hasOverlappingCourses()) {
-				System.out.println(s);
 			}
 		}
 		System.out.println("Printint all students schedule");

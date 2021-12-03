@@ -14,6 +14,8 @@ import java.util.List;
 import movement.MapBasedMovement;
 import movement.MovementModel;
 import movement.map.SimMap;
+import movement.schedule.Student;
+import movement.schedule.TUMScheduler;
 import routing.MessageRouter;
 
 /**
@@ -23,21 +25,21 @@ import routing.MessageRouter;
 public class SimScenario implements Serializable {
 
 	/** a way to get a hold of this... */
-	private static SimScenario myinstance=null;
+	private static SimScenario myinstance = null;
 
-	/** namespace of scenario settings ({@value})*/
+	/** namespace of scenario settings ({@value}) */
 	public static final String SCENARIO_NS = "Scenario";
-	/** number of host groups -setting id ({@value})*/
+	/** number of host groups -setting id ({@value}) */
 	public static final String NROF_GROUPS_S = "nrofHostGroups";
-	/** number of interface types -setting id ({@value})*/
+	/** number of interface types -setting id ({@value}) */
 	public static final String NROF_INTTYPES_S = "nrofInterfaceTypes";
-	/** scenario name -setting id ({@value})*/
+	/** scenario name -setting id ({@value}) */
 	public static final String NAME_S = "name";
-	/** end time -setting id ({@value})*/
+	/** end time -setting id ({@value}) */
 	public static final String END_TIME_S = "endTime";
-	/** update interval -setting id ({@value})*/
+	/** update interval -setting id ({@value}) */
 	public static final String UP_INT_S = "updateInterval";
-	/** simulate connections -setting id ({@value})*/
+	/** simulate connections -setting id ({@value}) */
 	public static final String SIM_CON_S = "simulateConnections";
 
 	/** namespace for interface type settings ({@value}) */
@@ -54,21 +56,21 @@ public class SimScenario implements Serializable {
 	/** setting name for the number of applications */
 	public static final String APPCOUNT_S = "nrofApplications";
 
-	/** namespace for host group settings ({@value})*/
+	/** namespace for host group settings ({@value}) */
 	public static final String GROUP_NS = "Group";
-	/** group id -setting id ({@value})*/
+	/** group id -setting id ({@value}) */
 	public static final String GROUP_ID_S = "groupID";
-	/** number of hosts in the group -setting id ({@value})*/
+	/** number of hosts in the group -setting id ({@value}) */
 	public static final String NROF_HOSTS_S = "nrofHosts";
-	/** movement model class -setting id ({@value})*/
+	/** movement model class -setting id ({@value}) */
 	public static final String MOVEMENT_MODEL_S = "movementModel";
-	/** router class -setting id ({@value})*/
+	/** router class -setting id ({@value}) */
 	public static final String ROUTER_S = "router";
-	/** number of interfaces in the group -setting id ({@value})*/
+	/** number of interfaces in the group -setting id ({@value}) */
 	public static final String NROF_INTERF_S = "nrofInterfaces";
-	/** interface name in the group -setting id ({@value})*/
+	/** interface name in the group -setting id ({@value}) */
 	public static final String INTERFACENAME_S = "interface";
-	/** application name in the group -setting id ({@value})*/
+	/** application name in the group -setting id ({@value}) */
 	public static final String GAPPNAME_S = "application";
 
 	/** package where to look for movement models */
@@ -155,7 +157,7 @@ public class SimScenario implements Serializable {
 
 		/* TODO: check size from movement models */
 		s.setNameSpace(MovementModel.MOVEMENT_MODEL_NS);
-		int [] worldSize = s.getCsvInts(MovementModel.WORLD_SIZE, 2);
+		int[] worldSize = s.getCsvInts(MovementModel.WORLD_SIZE, 2);
 		this.worldSizeX = worldSize[0];
 		this.worldSizeY = worldSize[1];
 
@@ -176,10 +178,9 @@ public class SimScenario implements Serializable {
 		return myinstance;
 	}
 
-
-
 	/**
 	 * Returns the name of the simulation run
+	 * 
 	 * @return the name of the simulation run
 	 */
 	public String getName() {
@@ -188,6 +189,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns true if connections should be simulated
+	 * 
 	 * @return true if connections should be simulated (false if not)
 	 */
 	public boolean simulateConnections() {
@@ -196,6 +198,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns the width of the world
+	 * 
 	 * @return the width of the world
 	 */
 	public int getWorldSizeX() {
@@ -204,6 +207,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns the height of the world
+	 * 
 	 * @return the height of the world
 	 */
 	public int getWorldSizeY() {
@@ -212,6 +216,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns simulation's end time
+	 * 
 	 * @return simulation's end time
 	 */
 	public double getEndTime() {
@@ -220,6 +225,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns update interval (simulated seconds) of the simulation
+	 * 
 	 * @return update interval (simulated seconds) of the simulation
 	 */
 	public double getUpdateInterval() {
@@ -228,6 +234,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns how long range the hosts' radios have
+	 * 
 	 * @return Range in meters
 	 */
 	public double getMaxHostRange() {
@@ -237,6 +244,7 @@ public class SimScenario implements Serializable {
 	/**
 	 * Returns the (external) event queue(s) of this scenario or null if there
 	 * aren't any
+	 * 
 	 * @return External event queues in a list or null
 	 */
 	public List<EventQueue> getExternalEvents() {
@@ -246,6 +254,7 @@ public class SimScenario implements Serializable {
 	/**
 	 * Returns the SimMap this scenario uses, or null if scenario doesn't
 	 * use any map
+	 * 
 	 * @return SimMap or null if no map is used
 	 */
 	public SimMap getMap() {
@@ -254,25 +263,28 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Adds a new connection listener for all nodes
+	 * 
 	 * @param cl The listener
 	 */
-	public void addConnectionListener(ConnectionListener cl){
+	public void addConnectionListener(ConnectionListener cl) {
 		this.connectionListeners.add(cl);
 	}
 
 	/**
 	 * Adds a new message listener for all nodes
+	 * 
 	 * @param ml The listener
 	 */
-	public void addMessageListener(MessageListener ml){
+	public void addMessageListener(MessageListener ml) {
 		this.messageListeners.add(ml);
 	}
 
 	/**
 	 * Adds a new movement listener for all nodes
+	 * 
 	 * @param ml The listener
 	 */
-	public void addMovementListener(MovementListener ml){
+	public void addMovementListener(MovementListener ml) {
 		this.movementListeners.add(ml);
 
 		// Invoke the initialLocation() for all nodes that already exist in
@@ -285,6 +297,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Adds a new update listener for the world
+	 * 
 	 * @param ul The listener
 	 */
 	public void addUpdateListener(UpdateListener ul) {
@@ -293,6 +306,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns the list of registered update listeners
+	 * 
 	 * @return the list of registered update listeners
 	 */
 	public List<UpdateListener> getUpdateListeners() {
@@ -301,6 +315,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Adds a new application event listener for all nodes.
+	 * 
 	 * @param al The listener
 	 */
 	public void addApplicationListener(ApplicationListener al) {
@@ -309,6 +324,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns the list of registered application event listeners
+	 * 
 	 * @return the list of registered application event listeners
 	 */
 	public List<ApplicationListener> getApplicationListeners() {
@@ -321,10 +337,9 @@ public class SimScenario implements Serializable {
 	protected void createHosts() {
 		this.hosts = new ArrayList<DTNHost>();
 
-		for (int i=1; i<=nrofGroups; i++) {
-			List<NetworkInterface> interfaces =
-				new ArrayList<NetworkInterface>();
-			Settings s = new Settings(GROUP_NS+i);
+		for (int i = 1; i <= nrofGroups; i++) {
+			List<NetworkInterface> interfaces = new ArrayList<NetworkInterface>();
+			Settings s = new Settings(GROUP_NS + i);
 			s.setSecondaryNamespace(GROUP_NS);
 			String gid = s.getSetting(GROUP_ID_S);
 			int nrofHosts = s.getInt(NROF_HOSTS_S);
@@ -332,24 +347,21 @@ public class SimScenario implements Serializable {
 			int appCount;
 
 			// creates prototypes of MessageRouter and MovementModel
-			MovementModel mmProto =
-				(MovementModel)s.createIntializedObject(MM_PACKAGE +
-						s.getSetting(MOVEMENT_MODEL_S));
-			MessageRouter mRouterProto =
-				(MessageRouter)s.createIntializedObject(ROUTING_PACKAGE +
-						s.getSetting(ROUTER_S));
+			MovementModel mmProto = (MovementModel) s.createIntializedObject(MM_PACKAGE +
+					s.getSetting(MOVEMENT_MODEL_S));
+			MessageRouter mRouterProto = (MessageRouter) s.createIntializedObject(ROUTING_PACKAGE +
+					s.getSetting(ROUTER_S));
 
 			/* checks that these values are positive (throws Error if not) */
 			s.ensurePositiveValue(nrofHosts, NROF_HOSTS_S);
 			s.ensurePositiveValue(nrofInterfaces, NROF_INTERF_S);
 
 			// setup interfaces
-			for (int j=1;j<=nrofInterfaces;j++) {
+			for (int j = 1; j <= nrofInterfaces; j++) {
 				String intName = s.getSetting(INTERFACENAME_S + j);
 				Settings intSettings = new Settings(intName);
-				NetworkInterface iface =
-					(NetworkInterface)intSettings.createIntializedObject(
-							INTTYPE_PACKAGE +intSettings.getSetting(INTTYPE_S));
+				NetworkInterface iface = (NetworkInterface) intSettings.createIntializedObject(
+						INTTYPE_PACKAGE + intSettings.getSetting(INTTYPE_S));
 				iface.setClisteners(connectionListeners);
 				iface.setGroupSettings(s);
 				interfaces.add(iface);
@@ -361,21 +373,21 @@ public class SimScenario implements Serializable {
 			} else {
 				appCount = 0;
 			}
-			for (int j=1; j<=appCount; j++) {
+			for (int j = 1; j <= appCount; j++) {
 				String appname = null;
 				Application protoApp = null;
 				try {
 					// Get name of the application for this group
-					appname = s.getSetting(GAPPNAME_S+j);
+					appname = s.getSetting(GAPPNAME_S + j);
 					// Get settings for the given application
 					Settings t = new Settings(appname);
 					// Load an instance of the application
-					protoApp = (Application)t.createIntializedObject(
+					protoApp = (Application) t.createIntializedObject(
 							APP_PACKAGE + t.getSetting(APPTYPE_S));
 					// Set application listeners
 					protoApp.setAppListeners(this.appListeners);
 					// Set the proto application in proto router
-					//mRouterProto.setApplication(protoApp);
+					// mRouterProto.setApplication(protoApp);
 					mRouterProto.addApplication(protoApp);
 				} catch (SettingsError se) {
 					// Failed to create an application for this group
@@ -386,25 +398,40 @@ public class SimScenario implements Serializable {
 			}
 
 			if (mmProto instanceof MapBasedMovement) {
-				this.simMap = ((MapBasedMovement)mmProto).getMap();
+				this.simMap = ((MapBasedMovement) mmProto).getMap();
 			}
 
 			// creates hosts of ith group
-			for (int j=0; j<nrofHosts; j++) {
+			/*
+			 * for (int j=0; j<nrofHosts; j++) {
+			 * ModuleCommunicationBus comBus = new ModuleCommunicationBus();
+			 * 
+			 * // prototypes are given to new DTNHost which replicates
+			 * // new instances of movement model and message router
+			 * DTNHost host = new DTNHost(this.messageListeners,
+			 * this.movementListeners, gid, interfaces, comBus,
+			 * mmProto, mRouterProto);
+			 * hosts.add(host);
+			 * }
+			 */
+			TUMScheduler scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
+			for (Student student : scheduler.getStudents()) {
 				ModuleCommunicationBus comBus = new ModuleCommunicationBus();
-
-				// prototypes are given to new DTNHost which replicates
-				// new instances of movement model and message router
-				DTNHost host = new DTNHost(this.messageListeners,
-						this.movementListeners,	gid, interfaces, comBus,
+				// TODO: extend class DTNHost with ref to student
+				// such that movement model can access student schedule
+				DTNHostStudent host = new DTNHostStudent(this.messageListeners,
+						this.movementListeners, gid, interfaces, comBus,
 						mmProto, mRouterProto);
 				hosts.add(host);
+				student.setDTNHost(host);
+				host.setStudent(student);
 			}
 		}
 	}
 
 	/**
 	 * Returns the list of nodes for this scenario.
+	 * 
 	 * @return the list of nodes for this scenario.
 	 */
 	public List<DTNHost> getHosts() {
@@ -413,6 +440,7 @@ public class SimScenario implements Serializable {
 
 	/**
 	 * Returns the World object of this scenario
+	 * 
 	 * @return the World object
 	 */
 	public World getWorld() {

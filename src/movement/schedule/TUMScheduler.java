@@ -133,7 +133,6 @@ public class TUMScheduler implements Serializable {
 
 	public ArrayList<Student> getStudents() {
 		return students;
-
 	}
 
 	/**

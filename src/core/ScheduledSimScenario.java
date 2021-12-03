@@ -17,7 +17,7 @@ import routing.MessageRouter;
 
 public class ScheduledSimScenario extends SimScenario {
     /** a way to get a hold of this... */
-    private static SimScenario myinstance = null;
+    private static ScheduledSimScenario myinstance = null;
 
     /** namespace of scenario settings ({@value}) */
     public static final String SCENARIO_NS = "Scenario";
@@ -75,40 +75,17 @@ public class ScheduledSimScenario extends SimScenario {
 
     /** package where to look for application classes */
     private static final String APP_PACKAGE = "applications.";
+    private SimMap simMap;
 
-    /** The world instance */
-    private World world;
-    /** List of hosts in this simulation */
-    protected List<DTNHost> hosts;
-    /** Name of the simulation */
-    private String name;
     /** number of host groups */
     int nrofGroups;
     /** Width of the world */
-    private int worldSizeX;
-    /** Height of the world */
-    private int worldSizeY;
-    /** Largest host's radio range */
-    private double maxHostRange;
-    /** Simulation end time */
-    private double endTime;
-    /** Update interval of sim time */
-    private double updateInterval;
-    /** External events queue */
-    private EventQueueHandler eqHandler;
-    /** Should connections between hosts be simulated */
-    private boolean simulateConnections;
-    /** Map used for host movement (if any) */
-    private SimMap simMap;
-
     /** Global connection event listeners */
     private List<ConnectionListener> connectionListeners;
     /** Global message event listeners */
     private List<MessageListener> messageListeners;
     /** Global movement event listeners */
     private List<MovementListener> movementListeners;
-    /** Global update event listeners */
-    private List<UpdateListener> updateListeners;
     /** Global application event listeners */
     private List<ApplicationListener> appListeners;
 
@@ -121,10 +98,34 @@ public class ScheduledSimScenario extends SimScenario {
 
     }
 
+    static {
+        DTNSim.registerForReset(ScheduledSimScenario.class.getCanonicalName());
+        reset();
+    }
+
+    public static void reset() {
+        myinstance = null;
+    }
+
+    public static ScheduledSimScenario getInstance() {
+        if (myinstance == null) {
+            myinstance = new ScheduledSimScenario();
+        }
+        return myinstance;
+    }
+
     /**
      * Creates hosts for the scenario
      */
     protected void createHosts() {
+        /**
+         * TODO: this class is supposed to replace SimScenario
+         * due to it's implementation limitations (mostly becase a lot of methods and
+         * properties are marked as private), though, we cannot
+         * simply override some methods. Hence it was easier to tweak the original class
+         */
+        System.err.println(
+                "Creating hosts");
         this.hosts = new ArrayList<DTNHost>();
 
         for (int i = 1; i <= nrofGroups; i++) {
@@ -190,9 +191,9 @@ public class ScheduledSimScenario extends SimScenario {
             if (mmProto instanceof MapBasedMovement) {
                 this.simMap = ((MapBasedMovement) mmProto).getMap();
             }
-
-            // creates hosts of ith group
             /*
+             * // creates hosts of ith group
+             * /*
              * for (int j=0; j<nrofHosts; j++) {
              * 
              * // prototypes are given to new DTNHost which replicates
@@ -211,11 +212,12 @@ public class ScheduledSimScenario extends SimScenario {
                 ModuleCommunicationBus comBus = new ModuleCommunicationBus();
                 // TODO: extend class DTNHost with ref to student
                 // such that movement model can access student schedule
-                DTNHost host = new DTNHost(this.messageListeners,
+                DTNHostStudent host = new DTNHostStudent(this.messageListeners,
                         this.movementListeners, gid, interfaces, comBus,
                         mmProto, mRouterProto);
                 hosts.add(host);
                 student.setDTNHost(host);
+                host.setStudent(student);
             }
         }
     }

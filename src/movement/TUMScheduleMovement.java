@@ -10,40 +10,64 @@ import java.util.Queue;
 import java.util.Set;
 
 import core.Coord;
+import core.DTNHostStudent;
 import core.Settings;
 import core.SettingsError;
 import core.SimError;
 import input.WKTMapReader;
 import movement.map.SimMap;
+import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 
 public class TUMScheduleMovement extends MapBasedMovement {
     /** sim map for the model */
     private SimMap map = null;
-    /** node where the last path ended or node next to initial placement */
-    /** the indexes of the OK map files or null if all maps are OK */
-    private int[] okMapNodeTypes;
-    /** how many map files are read */
-    private int nrofMapFilesRead = 0;
-    /** map cache -- in case last mm read the same map, use it without loading */
     private static SimMap cachedMap = null;
     /** names of the previously cached map's files (for hit comparison) */
     private static List<String> cachedMapFiles = null;
 
-    List<Coord> poiss;
+    List<Coord> startingPoints;
+    List<Coord> roomsPoints;
+    private DijkstraPathFinder pathFinder;
+    private Coord location;
+
+    boolean foundOne = false;
 
     @Override
     public Path getPath() {
-        return super.getPath();
+        /**
+         * this is the interesting part:
+         * we need to decide wether student will go to next class
+         * or student will go to cafeteria
+         * or student will go to library
+         * or student will go home
+         */
+        if (foundOne) {
+            return null;
+        }
+        foundOne = true;
+        DTNHostStudent host = (DTNHostStudent) this.getHost();
+        Coord targetClass = this.roomsPoints.get(rng.nextInt(this.roomsPoints.size()));
+        MapNode destinationNode = getClosestMapNode(targetClass, this.getMap().getNodes());
+
+        List<MapNode> nodes = pathFinder.getShortestPath(lastMapNode,
+                destinationNode);
+        Path path = new Path(generateSpeed());
+        for (MapNode node : nodes) {
+            path.addWaypoint(node.getLocation());
+        }
+        location = destinationNode.getLocation().clone();
+        return path;
     }
 
     @Override
     public Coord getInitialLocation() {
 
         MapNode closes = getClosestMapNode(
-                this.poiss.get(rng.nextInt(this.poiss.size())), this.getMap().getNodes());
-        this.lastMapNode = closes;
-        return closes.getLocation().clone();
+                this.startingPoints.get(rng.nextInt(this.startingPoints.size())), this.getMap().getNodes());
+        lastMapNode = closes;
+        location = closes.getLocation().clone();
+        return location;
     }
 
     /**
@@ -67,7 +91,6 @@ public class TUMScheduleMovement extends MapBasedMovement {
                  // check out if previously asked map was asked again
             SimMap cached = checkCache(settings);
             if (cached != null) {
-                nrofMapFilesRead = cachedMapFiles.size();
                 return cached; // we had right map cached -> return it
             } else { // no hit -> reset cache
                 cachedMapFiles = new ArrayList<String>();
@@ -84,8 +107,6 @@ public class TUMScheduleMovement extends MapBasedMovement {
                 cachedMapFiles.add(pathFile);
                 r.addPaths(new File(pathFile), i);
             }
-
-            nrofMapFilesRead = nrofMapFiles;
         } catch (IOException e) {
             throw new SimError(e.toString(), e);
         }
@@ -99,15 +120,25 @@ public class TUMScheduleMovement extends MapBasedMovement {
         checkCoordValidity(simMap.getNodes());
         WKTMapReader pr = new WKTMapReader(true);
         try {
-            poiss = pr.readPoints(new File("data/fmi/cleaned/StartingPoints.wkt"));
+            startingPoints = pr.readPoints(new File("data/fmi/cleaned/StartingPoints.wkt"));
         } catch (Exception e) {
             throw new SimError(e.toString(), e);
         }
-        // map is mirrored, see base class at `mirror` method
-        for (Coord n : poiss) {
+        for (Coord n : startingPoints) {
             n.setLocation(n.getX(), -n.getY());
             n.translate(-offset.getX(), -offset.getY());
         }
+        WKTMapReader rr = new WKTMapReader(true);
+        try {
+            roomsPoints = rr.readPoints(new File("data/fmi/cleaned/rooms.wkt"));
+        } catch (Exception e) {
+            throw new SimError(e.toString(), e);
+        }
+        for (Coord n : roomsPoints) {
+            n.setLocation(n.getX(), -n.getY());
+            n.translate(-offset.getX(), -offset.getY());
+        }
+        System.out.println();
 
         cachedMap = simMap;
         return simMap;
@@ -231,16 +262,18 @@ public class TUMScheduleMovement extends MapBasedMovement {
         maxPathLength = 100;
         minPathLength = 10;
         backAllowed = false;
+        pathFinder = new DijkstraPathFinder(null);
     }
 
     public TUMScheduleMovement(final TUMScheduleMovement mbm) {
         super(mbm);
-        this.poiss = new ArrayList(mbm.poiss);
-        this.okMapNodeTypes = mbm.okMapNodeTypes;
+        this.startingPoints = mbm.startingPoints;
+        this.roomsPoints = mbm.roomsPoints;
         this.map = mbm.map;
         this.minPathLength = mbm.minPathLength;
         this.maxPathLength = mbm.maxPathLength;
         this.backAllowed = mbm.backAllowed;
+        this.pathFinder = mbm.pathFinder;
 
     }
 
@@ -259,5 +292,4 @@ public class TUMScheduleMovement extends MapBasedMovement {
         }
         System.out.println(pois);
     }
-
 }

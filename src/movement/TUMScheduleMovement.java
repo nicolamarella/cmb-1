@@ -23,6 +23,9 @@ import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 
 public class TUMScheduleMovement extends MapBasedMovement {
+    public static final String TUM_MOVEMENT_NS = "TUMScheduleMovement";
+    public static final String STATING_POINTS_FILE = "startingPointsFile";
+    public static final String ROOMS_FILE = "roomsFile";
     /** sim map for the model */
     private SimMap map = null;
     private static SimMap cachedMap = null;
@@ -121,9 +124,17 @@ public class TUMScheduleMovement extends MapBasedMovement {
         Coord offset = simMap.getMinBound().clone();
         simMap.translate(-offset.getX(), -offset.getY());
         checkCoordValidity(simMap.getNodes());
+        readStartingPoints(offset);
+        readRoomsPoints(offset);
+        cachedMap = simMap;
+        return simMap;
+    }
+
+    protected void readStartingPoints(Coord offset) {
+        Settings settings = new Settings(TUM_MOVEMENT_NS);
         WKTMapReader pr = new WKTMapReader(true);
         try {
-            startingPoints = pr.readPoints(new File("data/fmi/cleaned/StartingPoints.wkt"));
+            startingPoints = pr.readPoints(new File(settings.getSetting(STATING_POINTS_FILE)));
         } catch (Exception e) {
             throw new SimError(e.toString(), e);
         }
@@ -131,9 +142,13 @@ public class TUMScheduleMovement extends MapBasedMovement {
             n.setLocation(n.getX(), -n.getY());
             n.translate(-offset.getX(), -offset.getY());
         }
+    }
+
+    protected void readRoomsPoints(Coord offset) {
+        Settings settings = new Settings(TUM_MOVEMENT_NS);
         WKTMapReader rr = new WKTMapReader(true);
         try {
-            roomsPoints = rr.readPoints(new File("data/fmi/cleaned/rooms.wkt"));
+            roomsPoints = rr.readPoints(new File(settings.getSetting(ROOMS_FILE)));
         } catch (Exception e) {
             throw new SimError(e.toString(), e);
         }
@@ -141,10 +156,7 @@ public class TUMScheduleMovement extends MapBasedMovement {
             n.setLocation(n.getX(), -n.getY());
             n.translate(-offset.getX(), -offset.getY());
         }
-        System.out.println();
 
-        cachedMap = simMap;
-        return simMap;
     }
 
     /**

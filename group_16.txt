@@ -27,6 +27,11 @@ Group1.router = PassiveRouter
 ## Map based movement -movement model specific settings
 MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
+TUMScheduleMovement.startingPointsFile= data/fmi/cleaned/StartingPoints.wkt
+TUMScheduleMovement.roomsFile = data/fmi/cleaned/rooms.wkt
+
+# scheduler csv file
+TUMScheduler.scheduleCsvFile = data/fmi/fmi_schedule_tuesday.csv
 # Use second file for initial coordinates
 # PointsOfInterest.poiFile1 = data/fmi/cleaned/StartingPoints.wkt
 

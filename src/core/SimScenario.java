@@ -404,7 +404,7 @@ public class SimScenario implements Serializable {
 
 			if (mmProto instanceof TUMScheduleMovement) {
 				// we used the Student schedule node provisioner
-				TUMScheduler scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
+				TUMScheduler scheduler = TUMScheduler.getInstance();
 				System.out.println(scheduler);
 				for (Student student : scheduler.getStudents()) {
 					ModuleCommunicationBus comBus = new ModuleCommunicationBus();

@@ -93,8 +93,7 @@ public class ScheduledSimScenario extends SimScenario {
 
     protected ScheduledSimScenario() {
         super();
-        // FIXME: move schedule to settinfs
-        this.scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
+        this.scheduler = TUMScheduler.getInstance();
 
     }
 

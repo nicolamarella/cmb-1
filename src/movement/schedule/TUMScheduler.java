@@ -10,6 +10,8 @@ import java.io.IOException;
 
 import com.opencsv.CSVReader;
 
+import core.Settings;
+
 /**
  * This class is in charge of parsing an input file with rooms/lectures
  * schedules
@@ -22,6 +24,11 @@ import com.opencsv.CSVReader;
  * than the limit participants
  */
 public class TUMScheduler implements Serializable {
+	/**
+	 * Settings namespace and props
+	 */
+	public static final String TUM_SCHEDULER_NS = "TUMScheduler";
+	public static final String SCHEDULE_CSV_FILE = "scheduleCsvFile";
 
 	/**
 	 * normally students tries not to have overlapping classes
@@ -32,9 +39,9 @@ public class TUMScheduler implements Serializable {
 
 	private static TUMScheduler singleton_instance = null;
 
-	public static TUMScheduler getInstance(String scheduleCSVFile) {
+	public static TUMScheduler getInstance() {
 		if (singleton_instance == null) {
-			singleton_instance = new TUMScheduler(scheduleCSVFile);
+			singleton_instance = new TUMScheduler();
 		}
 		return singleton_instance;
 	}
@@ -46,8 +53,9 @@ public class TUMScheduler implements Serializable {
 	/**
 	 * This is private, to ensure singleton constructor
 	 */
-	private TUMScheduler(String scheduleCSVFile) {
-		this.scheduleCSVFile = scheduleCSVFile;
+	private TUMScheduler() {
+		Settings settings = new Settings(TUM_SCHEDULER_NS);
+		this.scheduleCSVFile = settings.getSetting(SCHEDULE_CSV_FILE);
 		this.loadCSV();
 		this.initSchedule();
 	}
@@ -149,7 +157,7 @@ public class TUMScheduler implements Serializable {
 		 * Used only for debug purposes
 		 */
 		System.out.println("Testing TUMScheduler");
-		TUMScheduler scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
+		TUMScheduler scheduler = TUMScheduler.getInstance();
 		System.out.println(scheduler);
 
 	}

@@ -1,10 +1,10 @@
 # Settings for map route based movement in a triangle.
 
 Scenario.name = MapRouteMovement
-Scenario.endTime = 6000
-Scenario.updateInterval = 0.1
+Scenario.endTime = 600000
+Scenario.updateInterval = 2
 Scenario.simulateConnections = false
-MovementModel.worldSize = 1000,1000
+MovementModel.worldSize = 500,500
 Events.nrof = 0
 
 # Communication Interface
@@ -13,22 +13,38 @@ myInterface.transmitRange = 0
 myInterface.transmitSpeed = 0
 
 # Groups
-Scenario.nrofHostGroups = 1
+Scenario.nrofHostGroups = 2
 
 Group1.groupID = x
-Group1.nrofHosts = 1
+# nrofHosts is ignored when using TUMScheduleMovement 
+Group1.nrofHosts = 0
 Group1.nrofInterfaces = 1
 Group1.interface1 = myInterface
-Group1.movementModel = MapRouteMovement
-Group1.routeFile = data/fmi/cleaned/fmi.wkt
-Group1.routeType = 1
+Group1.movementModel = TUMScheduleMovement 
 Group1.router = PassiveRouter
+# Group1.pois = 1,1
 
 ## Map based movement -movement model specific settings
 MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
-# used only to shift a bit the map down right - nothing more
-#MapBasedMovement.mapFile2 = data/cluster/origin.wkt
+TUMScheduleMovement.startingPointsFile= data/fmi/cleaned/StartingPoints.wkt
+TUMScheduleMovement.roomsFile = data/fmi/cleaned/rooms.wkt
+TUMScheduleMovement.nonLecutrePointsFile = data/fmi/cleaned/NonLecturePoints.wkt
+
+# scheduler csv file
+TUMScheduler.scheduleCsvFile = data/fmi/fmi_schedule_tuesday.csv
+# Use second file for initial coordinates
+# PointsOfInterest.poiFile1 = data/fmi/cleaned/StartingPoints.wkt
+
+
+# Group 2 = AP group
+Group2.groupID = AP
+Group2.nrofHosts = 1
+Group2.nrofInterfaces = 1
+Group2.interface1 = myInterface
+Group2.movementModel = StationaryMovement
+Group2.nodeLocation = 200,100
+Group2.router = PassiveRouter
 
 # GUI underlay image settings
 GUI.UnderlayImage.fileName = data/fmi/cleaned/background.png

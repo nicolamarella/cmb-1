@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<JCSDataFile xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance" >
+<JCSGMLInputTemplate>
+<CollectionElement>featureCollection</CollectionElement>
+<FeatureElement>feature</FeatureElement>
+<GeometryElement>geometry</GeometryElement>
+<CRSElement>boundedBy</CRSElement>
+<ColumnDefinitions>
+</ColumnDefinitions>
+</JCSGMLInputTemplate>
+
+<featureCollection>
+  <gml:boundedBy>
+    <gml:Box>
+      <gml:coordinates decimal="." cs="," ts=" ">192.13,132.15 311.72,143.98</gml:coordinates>
+    </gml:Box>
+  </gml:boundedBy>
+  <feature>
+    <geometry>
+      <gml:Point>
+        <gml:coordinates>
+          282.57128616793716,132.14588401167597 
+        </gml:coordinates>
+      </gml:Point>
+    </geometry>
+  </feature>
+  <feature>
+    <geometry>
+      <gml:Point>
+        <gml:coordinates>
+          192.13409765607963,143.98043797709482 
+        </gml:coordinates>
+      </gml:Point>
+    </geometry>
+  </feature>
+  <feature>
+    <geometry>
+      <gml:Point>
+        <gml:coordinates>
+          311.71608324695376,140.44773530085038 
+        </gml:coordinates>
+      </gml:Point>
+    </geometry>
+  </feature>
+</featureCollection>
+</JCSDataFile>

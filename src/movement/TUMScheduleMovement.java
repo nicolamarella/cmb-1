@@ -26,6 +26,8 @@ public class TUMScheduleMovement extends MapBasedMovement {
     public static final String TUM_MOVEMENT_NS = "TUMScheduleMovement";
     public static final String STATING_POINTS_FILE = "startingPointsFile";
     public static final String ROOMS_FILE = "roomsFile";
+    public static final String NON_LECTURE_POINTS_FILE = "nonLecutrePointsFile";
+
     /** sim map for the model */
     private SimMap map = null;
     private static SimMap cachedMap = null;
@@ -34,8 +36,13 @@ public class TUMScheduleMovement extends MapBasedMovement {
 
     List<Coord> startingPoints;
     List<Coord> roomsPoints;
+    List<Coord> nonLecturePoints;
     private DijkstraPathFinder pathFinder;
     private Coord location;
+    MapNode exitNode;
+    private TUMRoomSchedule currentClass;
+
+    private TUMMovementState state = TUMMovementState.READY;
 
     @Override
     public Path getPath() {
@@ -46,33 +53,117 @@ public class TUMScheduleMovement extends MapBasedMovement {
          * or student will go to library
          * or student will go home
          */
-        final int curTime = SimClock.getIntTime();
+        updateState();
+        MapNode destinationNode = null;
+        if (state == TUMMovementState.CLASS) {
+            Coord targetClass = this.roomsPoints.get(currentClass.getPOIIndex());
+            destinationNode = getClosestMapNode(targetClass, this.getMap().getNodes());
+        }
+        if (state == TUMMovementState.NON_LECTURE) {
+            // no class, send student to study/caffetteria/home
+            // TODO: add smarter logic
+            Coord nextLocation = nonLecturePoints.get(rng.nextInt(nonLecturePoints.size()));
+            destinationNode = getClosestMapNode(nextLocation, this.getMap().getNodes());
+        }
+        if (state == TUMMovementState.DONE && exitNode == null) {
+            // any of the exist
+            exitNode = destinationNode = getClosestMapNode(
+                    this.startingPoints.get(rng.nextInt(this.startingPoints.size())), this.getMap().getNodes());
+        }
+        if (destinationNode != null) {
+            List<MapNode> nodes = pathFinder.getShortestPath(lastMapNode,
+                    destinationNode);
+            Path path = new Path(generateSpeed());
+            for (MapNode node : nodes) {
+                path.addWaypoint(node.getLocation());
+            }
+            location = destinationNode.getLocation().clone();
+            return path;
+
+        }
+        return null;
+
+    }
+
+    @Override
+    protected double generateWaitTime() {
         DTNHostStudent host = (DTNHostStudent) this.getHost();
         Student student = host.getStudent();
-        TUMRoomSchedule upcomingClass = student.getNextClass(curTime);
-        if (upcomingClass == null) {
-            return null;
+        int currTime = SimClock.getIntTime();
+        if (student == null) {
+            return 0;
         }
-        Coord targetClass = this.roomsPoints.get(upcomingClass.getPOIIndex());
-        MapNode destinationNode = getClosestMapNode(targetClass, this.getMap().getNodes());
+        TUMRoomSchedule upcomingClass = student.getUpcomingClass();
+        int timeRemainingToUpcomingClass = Integer.MAX_VALUE;
+        if (upcomingClass != null) {
+            timeRemainingToUpcomingClass = Math.max(upcomingClass.getStartTimeSecond() -
+                    currTime, 0);
+        }
+        if (state == TUMMovementState.READY) {
+            return Math.max(student.getFirstLectureStartSeconds() - currTime, 0);
+        }
+        if (state == TUMMovementState.CLASS) {
+            return Math.max(currentClass.getEndTimeSecond() - currTime, 0);
+        }
+        if (state == TUMMovementState.NON_LECTURE) {
+            // stay in this state until upcomfing
+            return Math.min(timeRemainingToUpcomingClass, (60 * 5) + rng.nextInt(60 *
+                    60 * 5)); // something between 5
+            // minutes and 5 hours
+        }
+        return 0;
+    }
 
-        List<MapNode> nodes = pathFinder.getShortestPath(lastMapNode,
-                destinationNode);
-        Path path = new Path(generateSpeed());
-        for (MapNode node : nodes) {
-            path.addWaypoint(node.getLocation());
+    private void updateState() {
+        /**
+         * Set the state based on what is up next for the student
+         */
+
+        DTNHostStudent host = (DTNHostStudent) this.getHost();
+        Student student = host.getStudent();
+        int currTime = SimClock.getIntTime();
+        TUMRoomSchedule nextClass = student.getNextClass();
+        TUMRoomSchedule upcomingClass = student.getUpcomingClass();
+        if (currentClass != null && currentClass.getEndTimeSecond() <= currTime) {
+            // current class is over
+            currentClass = null;
         }
-        location = destinationNode.getLocation().clone();
-        return path;
+        // if there are more on the schedule, but no nextClass, send student to
+        // relax/study
+        if (nextClass == null && upcomingClass != null) {
+            state = TUMMovementState.NON_LECTURE;
+            return;
+        }
+        if (nextClass != null) {
+            currentClass = nextClass;
+            state = TUMMovementState.CLASS;
+            return;
+        }
+        if (upcomingClass == null) {
+            // nothing left on the schedule, go home
+            state = TUMMovementState.DONE;
+        }
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
+        /*
+         * DTNHostStudent host = (DTNHostStudent) this.getHost();
+         * Student student = host.getStudent();
+         * return SimClock.getIntTime() > student.getFirstLectureStartSeconds()
+         * && SimClock.getIntTime() < student.getLastLectureEndSeconds();
+         */
+
     }
 
     @Override
     public Coord getInitialLocation() {
 
-        MapNode closes = getClosestMapNode(
+        MapNode closest = getClosestMapNode(
                 this.startingPoints.get(rng.nextInt(this.startingPoints.size())), this.getMap().getNodes());
-        lastMapNode = closes;
-        location = closes.getLocation().clone();
+        lastMapNode = closest;
+        location = closest.getLocation().clone();
         return location;
     }
 
@@ -124,39 +215,31 @@ public class TUMScheduleMovement extends MapBasedMovement {
         Coord offset = simMap.getMinBound().clone();
         simMap.translate(-offset.getX(), -offset.getY());
         checkCoordValidity(simMap.getNodes());
-        readStartingPoints(offset);
-        readRoomsPoints(offset);
+        Settings tumSettings = new Settings(TUM_MOVEMENT_NS);
+        // all points will require mirror and translation as above
+        startingPoints = readPointFile(offset, tumSettings.getSetting(STATING_POINTS_FILE));
+        roomsPoints = readPointFile(offset, tumSettings.getSetting(ROOMS_FILE));
+        nonLecturePoints = readPointFile(offset, tumSettings.getSetting(NON_LECTURE_POINTS_FILE));
+        System.out.println("non lecture points" + nonLecturePoints);
         cachedMap = simMap;
         return simMap;
     }
 
-    protected void readStartingPoints(Coord offset) {
-        Settings settings = new Settings(TUM_MOVEMENT_NS);
+    protected List<Coord> readPointFile(Coord offset, String pointFile) {
         WKTMapReader pr = new WKTMapReader(true);
+        List<Coord> result = null;
         try {
-            startingPoints = pr.readPoints(new File(settings.getSetting(STATING_POINTS_FILE)));
+            result = pr.readPoints(new File(pointFile));
         } catch (Exception e) {
             throw new SimError(e.toString(), e);
         }
-        for (Coord n : startingPoints) {
+        for (Coord n : result) {
+            // mirror
             n.setLocation(n.getX(), -n.getY());
+            // map translation
             n.translate(-offset.getX(), -offset.getY());
         }
-    }
-
-    protected void readRoomsPoints(Coord offset) {
-        Settings settings = new Settings(TUM_MOVEMENT_NS);
-        WKTMapReader rr = new WKTMapReader(true);
-        try {
-            roomsPoints = rr.readPoints(new File(settings.getSetting(ROOMS_FILE)));
-        } catch (Exception e) {
-            throw new SimError(e.toString(), e);
-        }
-        for (Coord n : roomsPoints) {
-            n.setLocation(n.getX(), -n.getY());
-            n.translate(-offset.getX(), -offset.getY());
-        }
-
+        return result;
     }
 
     /**
@@ -284,12 +367,13 @@ public class TUMScheduleMovement extends MapBasedMovement {
         super(mbm);
         this.startingPoints = mbm.startingPoints;
         this.roomsPoints = mbm.roomsPoints;
+        this.nonLecturePoints = mbm.nonLecturePoints;
         this.map = mbm.map;
         this.minPathLength = mbm.minPathLength;
         this.maxPathLength = mbm.maxPathLength;
         this.backAllowed = mbm.backAllowed;
         this.pathFinder = mbm.pathFinder;
-
+        this.state = mbm.state;
     }
 
     @Override
@@ -306,5 +390,13 @@ public class TUMScheduleMovement extends MapBasedMovement {
             throw new SimError(e.toString(), e);
         }
         System.out.println(pois);
+    }
+
+    public enum TUMMovementState {
+        READY, CLASS, NON_LECTURE, DONE
+    }
+
+    public TUMMovementState getState() {
+        return state;
     }
 }

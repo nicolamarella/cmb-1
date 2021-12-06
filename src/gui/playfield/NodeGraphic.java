@@ -15,6 +15,8 @@ import core.Coord;
 import core.DTNHost;
 import core.DTNHostStudent;
 import core.NetworkInterface;
+import movement.TUMScheduleMovement;
+import movement.TUMScheduleMovement.TUMMovementState;
 import movement.schedule.Student;
 
 /**
@@ -119,14 +121,20 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 		if (drawNodeName) {
 			if (node instanceof DTNHostStudent) {
-				Student s = ((DTNHostStudent) node).getStudent();
-				if (s.isHavingClass()) {
-					g2.setColor(Color.GREEN);
-
-				} else {
-					g2.setColor(hostNameColor);
-
-				}
+				/*
+				 * System.out.println("ok");
+				 * TUMScheduleMovement movement = (TUMScheduleMovement) ((DTNHostStudent)
+				 * node).getMovementModel();
+				 * TUMMovementState state = movement.getState();
+				 * System.out.println("stater is" + state);
+				 * if (state == TUMMovementState.CLASS) {
+				 * g2.setColor(Color.GREEN);
+				 * } else if (state == TUMMovementState.NON_LECTURE) {
+				 * g2.setColor(Color.MAGENTA);
+				 * } else {
+				 * }
+				 */
+				g2.setColor(hostNameColor);
 			} else {
 				g2.setColor(hostNameColor);
 

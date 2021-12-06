@@ -29,6 +29,7 @@ MapBasedMovement.nrofMapFiles = 1
 MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
 TUMScheduleMovement.startingPointsFile= data/fmi/cleaned/StartingPoints.wkt
 TUMScheduleMovement.roomsFile = data/fmi/cleaned/rooms.wkt
+TUMScheduleMovement.nonLecutrePointsFile = data/fmi/cleaned/NonLecturePoints.wkt
 
 # scheduler csv file
 TUMScheduler.scheduleCsvFile = data/fmi/fmi_schedule_tuesday.csv

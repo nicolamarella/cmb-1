@@ -7,6 +7,7 @@ import movement.schedule.Student;
 import routing.MessageRouter;
 
 public class DTNHostStudent extends DTNHost {
+    private Student student;
 
     public DTNHostStudent(List<MessageListener> msgLs, List<MovementListener> movLs, String groupId,
             List<NetworkInterface> interf, ModuleCommunicationBus comBus, MovementModel mmProto,
@@ -14,8 +15,6 @@ public class DTNHostStudent extends DTNHost {
         super(msgLs, movLs, groupId, interf, comBus, mmProto, mRouterProto);
         // TODO Auto-generated constructor stub
     }
-
-    private Student student;
 
     public Student getStudent() {
         return student;

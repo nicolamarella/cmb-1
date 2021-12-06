@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import core.DTNHost;
+import core.SimClock;
 
 /**
  * Act as a proxy/holder for DNTNode
@@ -19,23 +20,12 @@ public class Student {
     private boolean hasOverlappingCourses = false;
     private DTNHost host;
     // used to store the state of a student following a class
-    private TUMRoomSchedule currentClass;
     private Random rng = new Random();
 
+    private int firstLectureStartSeconds = Integer.MAX_VALUE;
+    private int lastLectureEndSeconds = 0;
+
     public Student() {
-    }
-
-    public boolean isHavingClass() {
-        return currentClass != null;
-    }
-
-    private void checkCurrentClassOver(int currentSeconds) {
-        if (isHavingClass()
-                && Math.abs(currentClass.getEndTimeSecond() - currentSeconds) < CLASS_SECOND_EARLY_LATE_THRESHOLD) {
-            // class is over, set it to null
-            System.out.println("Class is over!" + currentClass);
-            currentClass = null;
-        }
     }
 
     /**
@@ -44,13 +34,10 @@ public class Student {
      * 
      * @return
      */
-    public TUMRoomSchedule getNextClass(int currentSeconds) {
-        checkCurrentClassOver(currentSeconds);
-        if (isHavingClass()) {
-            // staying in the same class, no change
-            return null;
-        }
+    public TUMRoomSchedule getNextClass() {
+        int currentSeconds = SimClock.getIntTime();
         // we might have overlaps, for which we want to pick randomly
+        TUMRoomSchedule nextClass = null;
         List<TUMRoomSchedule> upcomingClasses = new ArrayList<TUMRoomSchedule>();
         for (TUMRoomSchedule s : schedule) {
             if (Math.abs(s.getStartTimeSecond() - currentSeconds) < CLASS_SECOND_EARLY_LATE_THRESHOLD) {
@@ -58,11 +45,25 @@ public class Student {
             }
         }
         if (upcomingClasses.size() > 0) {
-            currentClass = upcomingClasses.get(rng.nextInt(upcomingClasses.size()));
-            // set new class
-            System.out.println("New class set !" + currentClass);
+            nextClass = upcomingClasses.get(rng.nextInt(upcomingClasses.size()));
         }
-        return currentClass;
+        return nextClass;
+    }
+
+    public TUMRoomSchedule getUpcomingClass() {
+        // TODO: not really efficient, might use a min heap of any ordered stucture
+        // here.
+        int currTime = SimClock.getIntTime() - 10;
+        TUMRoomSchedule upcomingClass = null;
+        for (TUMRoomSchedule s : schedule) {
+            // find min
+            if (s.getStartTimeSecond() >= currTime
+                    && (upcomingClass == null || (s.getStartTimeSecond() < upcomingClass.getStartTimeSecond()))) {
+                upcomingClass = s;
+            }
+        }
+
+        return upcomingClass;
     }
 
     public void setDTNHost(DTNHost host) {
@@ -114,6 +115,21 @@ public class Student {
         }
         this.hasOverlappingCourses = this.isOverlappingForStudent(newSchedule);
         this.schedule.add(newSchedule);
+        // keep track of first lecture start and last lecture end
+        if (newSchedule.getStartTimeSecond() < firstLectureStartSeconds) {
+            firstLectureStartSeconds = newSchedule.getStartTimeSecond();
+        }
+        if (newSchedule.getEndTimeSecond() > lastLectureEndSeconds) {
+            lastLectureEndSeconds = newSchedule.getEndTimeSecond();
+        }
+    }
+
+    public int getLastLectureEndSeconds() {
+        return lastLectureEndSeconds;
+    }
+
+    public int getFirstLectureStartSeconds() {
+        return firstLectureStartSeconds;
     }
 
     @Override

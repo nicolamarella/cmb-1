@@ -13,7 +13,9 @@ import java.util.List;
 import core.Connection;
 import core.Coord;
 import core.DTNHost;
+import core.DTNHostStudent;
 import core.NetworkInterface;
+import movement.schedule.Student;
 
 /**
  * Visualization of a DTN Node
@@ -63,21 +65,21 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Visualize node's location, radio ranges and connections
+	 * 
 	 * @param g2 The graphic context to draw to
 	 */
 	private void drawHost(Graphics2D g2) {
 		Coord loc = node.getLocation();
 
 		if (drawCoverage && node.isRadioActive()) {
-			ArrayList<NetworkInterface> interfaces =
-				new ArrayList<NetworkInterface>();
+			ArrayList<NetworkInterface> interfaces = new ArrayList<NetworkInterface>();
 			interfaces.addAll(node.getInterfaces());
 			for (NetworkInterface ni : interfaces) {
 				double range = ni.getTransmitRange();
 				Ellipse2D.Double coverage;
 
-				coverage = new Ellipse2D.Double(scale(loc.getX()-range),
-						scale(loc.getY()-range), scale(range * 2),
+				coverage = new Ellipse2D.Double(scale(loc.getX() - range),
+						scale(loc.getY() - range), scale(range * 2),
 						scale(range * 2));
 
 				// draw the "range" circle
@@ -105,19 +107,30 @@ public class NodeGraphic extends PlayFieldGraphic {
 			}
 		}
 
-
 		/* draw node rectangle */
 		g2.setColor(hostColor);
-		g2.drawRect(scale(loc.getX()-1),scale(loc.getY()-1),
-		scale(2),scale(2));
+		g2.drawRect(scale(loc.getX() - 1), scale(loc.getY() - 1),
+				scale(2), scale(2));
 
 		if (isHighlighted()) {
 			g2.setColor(highlightedNodeColor);
-			g2.fillRect(scale(loc.getX()) - 3 ,scale(loc.getY()) - 3, 6, 6);
+			g2.fillRect(scale(loc.getX()) - 3, scale(loc.getY()) - 3, 6, 6);
 		}
 
 		if (drawNodeName) {
-			g2.setColor(hostNameColor);
+			if (node instanceof DTNHostStudent) {
+				Student s = ((DTNHostStudent) node).getStudent();
+				if (s.isHavingClass()) {
+					g2.setColor(Color.GREEN);
+
+				} else {
+					g2.setColor(hostNameColor);
+
+				}
+			} else {
+				g2.setColor(hostNameColor);
+
+			}
 			// Draw node's address next to it
 			g2.drawString(node.toString(), scale(loc.getX()),
 					scale(loc.getY()));
@@ -126,6 +139,7 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Sets whether radio coverage of nodes should be drawn
+	 * 
 	 * @param draw If true, radio coverage is drawn
 	 */
 	public static void setDrawCoverage(boolean draw) {
@@ -134,6 +148,7 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Sets whether node's name should be displayed
+	 * 
 	 * @param draw If true, node's name is displayed
 	 */
 	public static void setDrawNodeName(boolean draw) {
@@ -142,6 +157,7 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Sets whether node's connections to other nodes should be drawn
+	 * 
 	 * @param draw If true, node's connections to other nodes is drawn
 	 */
 	public static void setDrawConnections(boolean draw) {
@@ -150,6 +166,7 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Sets whether node's message buffer is shown
+	 * 
 	 * @param draw If true, node's message buffer is drawn
 	 */
 	public static void setDrawBuffer(boolean draw) {
@@ -162,22 +179,24 @@ public class NodeGraphic extends PlayFieldGraphic {
 
 	/**
 	 * Visualize the messages this node is carrying
+	 * 
 	 * @param g2 The graphic context to draw to
 	 */
 	private void drawMessages(Graphics2D g2) {
 		int nrofMessages = node.getNrofMessages();
 		Coord loc = node.getLocation();
 
-		drawBar(g2,loc, nrofMessages % 10, 1);
-		drawBar(g2,loc, nrofMessages / 10, 2);
+		drawBar(g2, loc, nrofMessages % 10, 1);
+		drawBar(g2, loc, nrofMessages / 10, 2);
 	}
 
 	/**
 	 * Draws a bar (stack of squares) next to a location
-	 * @param g2 The graphic context to draw to
-	 * @param loc The location where to draw
+	 * 
+	 * @param g2   The graphic context to draw to
+	 * @param loc  The location where to draw
 	 * @param nrof How many squares in the stack
-	 * @param col Which column
+	 * @param col  Which column
 	 */
 	private void drawBar(Graphics2D g2, Coord loc, int nrof, int col) {
 		final int BAR_HEIGHT = 5;
@@ -185,21 +204,19 @@ public class NodeGraphic extends PlayFieldGraphic {
 		final int BAR_DISPLACEMENT = 2;
 
 		// draws a stack of squares next loc
-		for (int i=1; i <= nrof; i++) {
-			if (i%2 == 0) { // use different color for every other msg
+		for (int i = 1; i <= nrof; i++) {
+			if (i % 2 == 0) { // use different color for every other msg
 				g2.setColor(msgColor1);
-			}
-			else {
+			} else {
 				if (col > 1) {
 					g2.setColor(msgColor3);
-				}
-				else {
+				} else {
 					g2.setColor(msgColor2);
 				}
 			}
 
-			g2.fillRect(scale(loc.getX()-BAR_DISPLACEMENT-(BAR_WIDTH*col)),
-					scale(loc.getY()- BAR_DISPLACEMENT- i* BAR_HEIGHT),
+			g2.fillRect(scale(loc.getX() - BAR_DISPLACEMENT - (BAR_WIDTH * col)),
+					scale(loc.getY() - BAR_DISPLACEMENT - i * BAR_HEIGHT),
 					scale(BAR_WIDTH), scale(BAR_HEIGHT));
 		}
 

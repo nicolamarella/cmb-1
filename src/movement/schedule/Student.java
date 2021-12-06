@@ -1,6 +1,8 @@
 package movement.schedule;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import core.DTNHost;
 
@@ -10,10 +12,58 @@ import core.DTNHost;
  */
 public class Student {
     public static int MAX_CLASSES_PER_STUDENT = 3;
+    /** Students might be 5 mins late or early to class */
+    public static int CLASS_SECOND_EARLY_LATE_THRESHOLD = 60 * 5;
 
     private ArrayList<TUMRoomSchedule> schedule = new ArrayList<>();
     private boolean hasOverlappingCourses = false;
     private DTNHost host;
+    // used to store the state of a student following a class
+    private TUMRoomSchedule currentClass;
+    private Random rng = new Random();
+
+    public Student() {
+    }
+
+    public boolean isHavingClass() {
+        return currentClass != null;
+    }
+
+    private void checkCurrentClassOver(int currentSeconds) {
+        if (isHavingClass()
+                && Math.abs(currentClass.getEndTimeSecond() - currentSeconds) < CLASS_SECOND_EARLY_LATE_THRESHOLD) {
+            // class is over, set it to null
+            System.out.println("Class is over!" + currentClass);
+            currentClass = null;
+        }
+    }
+
+    /**
+     * Returns the next class given the time, might return null if student has no
+     * schedule
+     * 
+     * @return
+     */
+    public TUMRoomSchedule getNextClass(int currentSeconds) {
+        checkCurrentClassOver(currentSeconds);
+        if (isHavingClass()) {
+            // staying in the same class, no change
+            return null;
+        }
+        // we might have overlaps, for which we want to pick randomly
+        List<TUMRoomSchedule> upcomingClasses = new ArrayList<TUMRoomSchedule>();
+        for (TUMRoomSchedule s : schedule) {
+            if (Math.abs(s.getStartTimeSecond() - currentSeconds) < CLASS_SECOND_EARLY_LATE_THRESHOLD) {
+                upcomingClasses.add(s);
+            }
+        }
+        if (upcomingClasses.size() > 0) {
+            currentClass = upcomingClasses.get(rng.nextInt(upcomingClasses.size()));
+            // set new class
+            System.out.println("New class set !" + currentClass);
+        }
+        return currentClass;
+    }
 
     public void setDTNHost(DTNHost host) {
         this.host = host;
@@ -39,9 +89,6 @@ public class Student {
      */
     public boolean isFullyStuffed() {
         return this.schedule.size() >= MAX_CLASSES_PER_STUDENT;
-    }
-
-    public Student() {
     }
 
     /**

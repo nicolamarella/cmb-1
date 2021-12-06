@@ -13,6 +13,7 @@ import java.util.List;
 
 import movement.MapBasedMovement;
 import movement.MovementModel;
+import movement.TUMScheduleMovement;
 import movement.map.SimMap;
 import movement.schedule.Student;
 import movement.schedule.TUMScheduler;
@@ -401,30 +402,31 @@ public class SimScenario implements Serializable {
 				this.simMap = ((MapBasedMovement) mmProto).getMap();
 			}
 
-			// creates hosts of ith group
-			/*
-			 * for (int j=0; j<nrofHosts; j++) {
-			 * ModuleCommunicationBus comBus = new ModuleCommunicationBus();
-			 * 
-			 * // prototypes are given to new DTNHost which replicates
-			 * // new instances of movement model and message router
-			 * DTNHost host = new DTNHost(this.messageListeners,
-			 * this.movementListeners, gid, interfaces, comBus,
-			 * mmProto, mRouterProto);
-			 * hosts.add(host);
-			 * }
-			 */
-			TUMScheduler scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
-			for (Student student : scheduler.getStudents()) {
-				ModuleCommunicationBus comBus = new ModuleCommunicationBus();
-				// TODO: extend class DTNHost with ref to student
-				// such that movement model can access student schedule
-				DTNHostStudent host = new DTNHostStudent(this.messageListeners,
-						this.movementListeners, gid, interfaces, comBus,
-						mmProto, mRouterProto);
-				hosts.add(host);
-				student.setDTNHost(host);
-				host.setStudent(student);
+			if (mmProto instanceof TUMScheduleMovement) {
+				// we used the Student schedule node provisioner
+				TUMScheduler scheduler = TUMScheduler.getInstance("data/fmi/fmi_schedule_tuesday.csv");
+				System.out.println(scheduler);
+				for (Student student : scheduler.getStudents()) {
+					ModuleCommunicationBus comBus = new ModuleCommunicationBus();
+					DTNHostStudent host = new DTNHostStudent(this.messageListeners,
+							this.movementListeners, gid, interfaces, comBus,
+							mmProto, mRouterProto);
+					hosts.add(host);
+					student.setDTNHost(host);
+					host.setStudent(student);
+				}
+			} else {
+				// all other movements models
+				// creates hosts of ith group
+				for (int j = 0; j < nrofHosts; j++) {
+					ModuleCommunicationBus comBus = new ModuleCommunicationBus();
+					// prototypes are given to new DTNHost which replicates
+					// new instances of movement model and message router
+					DTNHost host = new DTNHost(this.messageListeners,
+							this.movementListeners, gid, interfaces, comBus,
+							mmProto, mRouterProto);
+					hosts.add(host);
+				}
 			}
 		}
 	}

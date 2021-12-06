@@ -1,6 +1,7 @@
 package movement.schedule;
 
 import java.io.Serializable;
+import java.net.SecureCacheResponse;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.io.FileNotFoundException; // Import this class to handle errors
@@ -136,7 +137,11 @@ public class TUMScheduler implements Serializable {
 	 * @return a String representation of the TUM map
 	 */
 	public String toString() {
-		return "TBD";
+		StringBuilder sb = new StringBuilder();
+		for (Student s : getStudents()) {
+			sb.append(s.toString());
+		}
+		return sb.toString();
 	}
 
 	public static void main(String[] args) {

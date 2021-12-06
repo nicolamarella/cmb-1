@@ -13,9 +13,12 @@ import core.Coord;
 import core.DTNHostStudent;
 import core.Settings;
 import core.SettingsError;
+import core.SimClock;
 import core.SimError;
 import input.WKTMapReader;
 import movement.map.SimMap;
+import movement.schedule.Student;
+import movement.schedule.TUMRoomSchedule;
 import movement.map.DijkstraPathFinder;
 import movement.map.MapNode;
 
@@ -31,8 +34,6 @@ public class TUMScheduleMovement extends MapBasedMovement {
     private DijkstraPathFinder pathFinder;
     private Coord location;
 
-    boolean foundOne = false;
-
     @Override
     public Path getPath() {
         /**
@@ -42,12 +43,14 @@ public class TUMScheduleMovement extends MapBasedMovement {
          * or student will go to library
          * or student will go home
          */
-        if (foundOne) {
+        final int curTime = SimClock.getIntTime();
+        DTNHostStudent host = (DTNHostStudent) this.getHost();
+        Student student = host.getStudent();
+        TUMRoomSchedule upcomingClass = student.getNextClass(curTime);
+        if (upcomingClass == null) {
             return null;
         }
-        foundOne = true;
-        DTNHostStudent host = (DTNHostStudent) this.getHost();
-        Coord targetClass = this.roomsPoints.get(rng.nextInt(this.roomsPoints.size()));
+        Coord targetClass = this.roomsPoints.get(upcomingClass.getPOIIndex());
         MapNode destinationNode = getClosestMapNode(targetClass, this.getMap().getNodes());
 
         List<MapNode> nodes = pathFinder.getShortestPath(lastMapNode,

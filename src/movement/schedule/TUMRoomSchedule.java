@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class TUMRoomSchedule implements Comparable<TUMRoomSchedule> {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:m");
+    private int poiIndex;
     private String roomRef;
     private String course;
     private LocalTime startTime;
@@ -23,17 +24,18 @@ public class TUMRoomSchedule implements Comparable<TUMRoomSchedule> {
      * @param csvLine comma separated line
      */
     public TUMRoomSchedule(String[] values) {
-        if (values.length != 11) {
+        if (values.length != 12) {
             System.err.println("CSV entries should be exactly 11. Does the line contains commas?");
             System.err.println(values);
             System.exit(-1);
         }
-        this.roomRef = values[0];
-        this.course = values[6];
-        this.startTime = LocalTime.parse(values[4], TUMRoomSchedule.formatter);
-        this.endTime = LocalTime.parse(values[5], TUMRoomSchedule.formatter);
+        this.poiIndex = Integer.parseInt(values[0]);
+        this.roomRef = values[1];
+        this.course = values[7];
+        this.startTime = LocalTime.parse(values[5], TUMRoomSchedule.formatter);
+        this.endTime = LocalTime.parse(values[6], TUMRoomSchedule.formatter);
         try {
-            this.participants = Integer.parseInt(values[7]);
+            this.participants = Integer.parseInt(values[8]);
         } catch (Exception e) {
             this.participants = 0;
             System.err.println(
@@ -58,7 +60,7 @@ public class TUMRoomSchedule implements Comparable<TUMRoomSchedule> {
      * @return true if there is more room for new participants
      */
     public boolean hasMoreSlots() {
-        return this.assignedStudents.size() <= this.participants;
+        return this.assignedStudents.size() < this.participants;
     }
 
     public int remainingSlots() {
@@ -102,12 +104,36 @@ public class TUMRoomSchedule implements Comparable<TUMRoomSchedule> {
         return startTime;
     }
 
+    /**
+     * Simulation time is given in seconds since start of the simulation
+     * hence it's easier to give start and end time in seconds
+     * from a common point in time (say 8.00 am)
+     * 
+     * @return
+     */
+    public int getStartTimeSecond() {
+        return startTime.toSecondOfDay() - 28800;
+    }
+
+    /**
+     * Same as getStartTimeSecond but for endTime
+     * 
+     * @return
+     */
+    public int getEndTimeSecond() {
+        return endTime.toSecondOfDay() - 28800;
+    }
+
     public LocalTime getEndTime() {
         return endTime;
     }
 
     public int getParticipants() {
         return participants;
+    }
+
+    public int getPOIIndex() {
+        return poiIndex;
     }
 
     public void setParticipants(int participants) {
@@ -117,7 +143,7 @@ public class TUMRoomSchedule implements Comparable<TUMRoomSchedule> {
     @Override
     public String toString() {
         return "Room schedule for room " + this.roomRef + " with " + this.participants + " participants. From "
-                + this.startTime + " to " + this.endTime;
+                + this.startTime + "(" + getStartTimeSecond() + ") to " + this.endTime + "(" + getEndTimeSecond() + ")";
     }
 
     @Override

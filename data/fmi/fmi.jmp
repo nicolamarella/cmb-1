@@ -7,7 +7,7 @@
     </mapping>
     <mapping>
       <key class="javax.xml.namespace.QName">Project Date</key>
-      <value class="java.lang.String">2021/12/03 13:27:09</value>
+      <value class="java.lang.String">2021/12/03 13:58:31</value>
     </mapping>
   </properties>
   <windowLocation X="5" Y="5" />
@@ -113,7 +113,7 @@
         </styles>
         <feature-schema-operation>NULL</feature-schema-operation>
       </layer>
-      <layer class="com.vividsolutions.jump.workbench.model.Layer" name="pois_scaled" visible="false" editable="false" selectable="true" read-only="false" drawnLast="false" synchronizedLineColor="true">
+      <layer class="com.vividsolutions.jump.workbench.model.Layer" name="rooms" visible="true" editable="false" selectable="true" read-only="false" drawnLast="false" synchronizedLineColor="true">
         <scaleDependentRendering enabled="false">
           <minScale null="true" />
           <maxScale null="true" />
@@ -125,11 +125,11 @@
             <properties class="java.util.HashMap">
               <mapping>
                 <key class="java.lang.String">Uri</key>
-                <value class="java.lang.String">file:/workspace/connected-mobility/the-one/data/fmi/cleaned/pois.wkt</value>
+                <value class="java.lang.String">file:/workspace/connected-mobility/the-one/data/fmi/cleaned/rooms.wkt</value>
               </mapping>
               <mapping>
                 <key class="java.lang.String">File</key>
-                <value class="java.lang.String">/workspace/connected-mobility/the-one/data/fmi/cleaned/pois.wkt</value>
+                <value class="java.lang.String">/workspace/connected-mobility/the-one/data/fmi/cleaned/rooms.wkt</value>
               </mapping>
               <mapping>
                 <key class="java.lang.String">Coordinate System</key>

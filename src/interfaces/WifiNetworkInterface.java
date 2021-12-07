@@ -125,8 +125,8 @@ public class WifiNetworkInterface extends NetworkInterface {
             }
         }
 
-        Collection<WifiNetworkInterface> interfaces =
-            optimizer.getNearInterfaces(this).stream().filter(i -> i instanceof WifiNetworkInterface).collect(Collectors.toCollection);
+        Collection<WifiNetworkInterface> interfaces = optimizer.getNearInterfaces(this).stream()
+                .filter(i -> i instanceof WifiNetworkInterface).map(i -> (WifiNetworkInterface) i).toList();
 
         this.noiseFactor = interfaces.stream()
                 .filter(i -> i.isAccessPoint)

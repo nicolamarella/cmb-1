@@ -2,16 +2,13 @@
 
 Report.reportDir = reports
 Report.warmup = 200
-Report.nrofReports = 3
+Report.nrofReports = 2
 
 Report.report1 = NodeDensityReport
-NodeDensityReport.xCount = 10
-NodeDensityReport.yCount = 10
+NodeDensityReport.xCount = 50
+NodeDensityReport.yCount = 50
 NodeDensityReport.outputGnuplot = true
 NodeDensityReport.onlyAverage = true
 
-Report.report2 = ContactTimesReport
-ContactTimesReport.granularity = 100
-
-Report.report3 = InterContactTimesReport
-InterContactTimesReport.granularity = 100
+Report.report2 = ConnectionSpeedReport
+ConnectionSpeedReport.sampleInterval = 500

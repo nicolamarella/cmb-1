@@ -7,10 +7,20 @@ Scenario.simulateConnections = false
 MovementModel.worldSize = 500,500
 Events.nrof = 0
 
-# Communication Interface
-myInterface.type = SimpleBroadcastInterface
-myInterface.transmitRange = 0
-myInterface.transmitSpeed = 0
+# Communication Interfaces
+mobileInterface.type = WifiNetworkInterface
+mobileInterface.transmitRange = 1
+mobileInterface.transmitSpeed = 30
+mobileInterface.transmitSpeeds = [1, 0.6, 0.3]
+mobileInterface.transmitPower = 5
+mobileInterface.isAccessPoint = false
+
+APInterface.type = WifiNetworkInterface
+APInterface.transmitRange = 5
+APInterface.transmitSpeed = 75
+APInterface.transmitSpeeds = [1, 0.6, 0.3]
+APInterface.transmitPower = 15
+APInterface.isAccessPoint = true
 
 # Groups
 Scenario.nrofHostGroups = 2
@@ -19,7 +29,7 @@ Group1.groupID = x
 # nrofHosts is ignored when using TUMScheduleMovement 
 Group1.nrofHosts = 0
 Group1.nrofInterfaces = 1
-Group1.interface1 = myInterface
+Group1.interface1 = mobileInterface
 Group1.movementModel = TUMScheduleMovement 
 Group1.router = PassiveRouter
 # Group1.pois = 1,1
@@ -41,7 +51,7 @@ TUMScheduler.scheduleCsvFile = data/fmi/fmi_schedule_tuesday.csv
 Group2.groupID = AP
 Group2.nrofHosts = 1
 Group2.nrofInterfaces = 1
-Group2.interface1 = myInterface
+Group2.interface1 = APInterface
 Group2.movementModel = StationaryMovement
 Group2.nodeLocation = 200,100
 Group2.router = PassiveRouter

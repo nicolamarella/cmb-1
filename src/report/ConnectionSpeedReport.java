@@ -34,7 +34,7 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
         });
 
         hosts.stream()
-                .map(DTNHost::getInterfaces)
+                .map(i -> i.getInterface(1))
                 .filter(WifiNetworkInterface.class::isInstance)
                 .map(WifiNetworkInterface.class::cast)
                 .filter(i -> !i.getIsAccessPoint())
@@ -55,12 +55,23 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
         for (WifiNetworkInterface APInterface: APInterfaces) {
             averageAPSpeeds.get(APInterface).add(calculateIntAverage(currentAPSpeeds.get(APInterface)));
         }
-        //TODO: Print out values for this interval
     }
 
     @Override
     public void done() {
         //TODO: Print out summary
+        init();
+        out.print("Connection Ratios:");
+        connectionRatios.forEach(ratio -> out.print("\t" + ratio));
+        out.print("\n");
+        out.print("Overall average Connection Speeds:");
+        averageConnectionSpeeds.forEach(speed -> out.print("\t" + speed));
+        out.print("\n");
+        for (WifiNetworkInterface in: APInterfaces) {
+            out.print(in.toString() + " average connection speeds");
+            averageAPSpeeds.get(in).forEach(speed -> out.print("\t" + speed));
+            out.print("\n");
+        }
         super.done();
     }
 

@@ -6,7 +6,6 @@ import core.Settings;
 import core.VBRConnection;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 
 /**
@@ -204,6 +203,4 @@ public class WifiNetworkInterface extends NetworkInterface {
     public String toString() {
         return "WifiNetworkInterface " + super.toString();
     }
-
-
 }

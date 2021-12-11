@@ -66,3 +66,16 @@ GUI.UnderlayImage.scale = 0.315
 GUI.UnderlayImage.rotate = 0.0
 
 # Reports
+
+Report.reportDir = reports
+Report.warmup = 200
+Report.nrofReports = 2
+
+Report.report1 = NodeDensityReport
+NodeDensityReport.xCount = 50
+NodeDensityReport.yCount = 50
+NodeDensityReport.outputGnuplot = true
+NodeDensityReport.onlyAverage = true
+
+Report.report2 = ConnectionSpeedReport
+ConnectionSpeedReport.sampleInterval = 500

@@ -1,11 +1,9 @@
 package interfaces;
 
-import core.Connection;
-import core.NetworkInterface;
-import core.Settings;
-import core.VBRConnection;
+import core.*;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 
 /**
@@ -18,36 +16,36 @@ public class WifiNetworkInterface extends NetworkInterface {
     public static final String TRANSMIT_SPEEDS_S = "transmitSpeeds";
     public static final String ACCESS_POINT_FLAG = "isAccessPoint";
     public static final String TRANSMIT_POWER = "transmitPower";
+    public static final String NOISE_MULTIPLIER = "noiseMultiplier";
+    public static final String SPEED_MULTIPLIER = "speedMultiplier";
 
-    protected int currentTransmitSpeed;
     protected int numberOfTransmissions;
     protected boolean isAccessPoint;
-    protected double noiseFactor;
-    protected double transmitPower;
+    protected double noiseFactor = 1.0;
+    protected int speedMultiplier;
+    protected int noiseMultiplier;
     protected final double[] transmitSpeeds;
+
+    private int numberOfConcurrentConnections;
 
     public WifiNetworkInterface(Settings s) {
         super(s);
-        this.currentTransmitSpeed = 0;
         this.numberOfTransmissions = 0;
-        this.noiseFactor = 0;
         this.transmitSpeeds = s.getCsvDoubles(TRANSMIT_SPEEDS_S);
-        this.isAccessPoint = s.getBoolean(ACCESS_POINT_FLAG, false);
-        this.transmitPower = s.getDouble(TRANSMIT_POWER, 1);
-        this.transmitRange *= this.transmitPower;
-
-
+        this.isAccessPoint = s.getBoolean(ACCESS_POINT_FLAG);
+        this.noiseMultiplier = s.getInt(NOISE_MULTIPLIER, 1);
+        this.speedMultiplier = s.getInt(SPEED_MULTIPLIER, 100);
+        this.interfacetype = "WIFI";
     }
 
     public WifiNetworkInterface(WifiNetworkInterface ni) {
         super(ni);
-        this.transmitRange = ni.transmitRange;
-        this.transmitSpeed = ni.transmitSpeed;
         this.isAccessPoint = ni.isAccessPoint;
-        this.currentTransmitSpeed = 0;
         this.numberOfTransmissions = 0;
-        this.transmitPower = 0;
+        this.noiseMultiplier = ni.noiseMultiplier;
+        this.speedMultiplier = ni.speedMultiplier;
         this.transmitSpeeds = ni.transmitSpeeds;
+        this.interfacetype = ni.interfacetype;
     }
 
     public boolean getIsAccessPoint() {
@@ -85,7 +83,23 @@ public class WifiNetworkInterface extends NetworkInterface {
         speed = this.transmitSpeeds[index] * (1-decimal) +
                 this.transmitSpeeds[index + 1] * decimal;
 
-        return (int)(speed * this.currentTransmitSpeed);
+        double transmissionSpeed = ((((double) speed * transmitRange * speedMultiplier) /
+                (Math.sqrt((1.0*numberOfConcurrentConnections) *
+                    Math.log(1.0*numberOfConcurrentConnections))) / numberOfTransmissions)
+                * noiseFactor);
+
+//        System.out.println("***");
+//        System.out.println("Distance: " + distance);
+//
+//        System.out.println("Transmission Speed: " + transmissionSpeed);
+//        System.out.println("Distance Speed Factor: " + speed);
+//        System.out.println("TransmitRange: " + transmitRange);
+//        System.out.println("nrofConcurrentConnections: " + numberOfConcurrentConnections);
+//        System.out.println("nrofConcurrentTransmitssions: " + numberOfTransmissions);
+//        System.out.println("noiseFactor: " + noiseFactor);
+//        System.out.println("***");
+
+        return (int) Math.floor(transmissionSpeed);
     }
 
     @Override
@@ -103,8 +117,24 @@ public class WifiNetworkInterface extends NetworkInterface {
         }
     }
 
+    private double calculateNoiseFactor(Collection<WifiNetworkInterface> nearby) {
+
+        double noiseFactor = nearby.stream()
+                .filter(i -> i.isAccessPoint && i != this)
+                .map(i -> (1 / i.getLocation().distance(this.getLocation())) * i.transmitRange * this.noiseMultiplier)
+                .reduce(0.0, Double::sum);
+
+        if(Double.isNaN(noiseFactor)) {
+            return 0.0;
+        }
+
+        return 1 - (Math.min(noiseFactor, 99.0)/100);
+
+    }
+
     @Override
     public void update() {
+
         if(optimizer == null) {
             return;
         }
@@ -125,16 +155,7 @@ public class WifiNetworkInterface extends NetworkInterface {
         }
 
         Collection<WifiNetworkInterface> interfaces = optimizer.getNearInterfaces(this).stream()
-                .filter(i -> i instanceof WifiNetworkInterface).map(i -> (WifiNetworkInterface) i).toList();
-
-        this.noiseFactor = interfaces.stream()
-                .filter(i -> i.isAccessPoint)
-                .map(i -> (1 / i.getLocation().distance(this.getLocation())) * i.transmitPower)
-                .reduce(0.0, Double::sum);
-
-        if(this.noiseFactor > 99.0) {
-            this.noiseFactor = 99.0;
-        }
+                .filter(i -> i instanceof WifiNetworkInterface).map(i -> (WifiNetworkInterface) i).collect(Collectors.toList());
 
 
         for (WifiNetworkInterface i: interfaces) {
@@ -143,27 +164,23 @@ public class WifiNetworkInterface extends NetworkInterface {
             }
         }
 
-        numberOfTransmissions = 0;
-        int numberOfActive = 1;
+        this.numberOfTransmissions = 0;
+        this.numberOfConcurrentConnections = 1;
         for (Connection con : this.connections) {
             if (con.getMessage() != null) {
-                numberOfTransmissions++;
+                this.numberOfTransmissions++;
             }
             if (con.getOtherInterface(this).isTransferring()) {
-                numberOfActive++;
+                this.numberOfConcurrentConnections++;
             }
         }
 
-        int ntrans = numberOfTransmissions;
-        if ( numberOfTransmissions < 1) ntrans = 1;
-        if ( numberOfActive <2 ) numberOfActive = 2;
-
+        this.numberOfTransmissions = Math.max(this.numberOfTransmissions, 1);
+        this.numberOfConcurrentConnections = Math.max(this.numberOfConcurrentConnections, 2);
+        this.noiseFactor = this.calculateNoiseFactor(interfaces);
         // Based on the equation of Gupta and Kumar - and the transmission speed
         // is divided equally to all the ongoing transmissions
-        currentTransmitSpeed = (int)Math.floor(((double)transmitSpeed /
-                (Math.sqrt((1.0*numberOfActive) *
-                        Math.log(1.0*numberOfActive))) /
-                ntrans ) *  (1 - (this.noiseFactor / 100)));
+        
 
         for (Connection con : getConnections()) {
             con.update();

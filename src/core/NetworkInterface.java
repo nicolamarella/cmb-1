@@ -61,7 +61,7 @@ abstract public class NetworkInterface implements ModuleCommunicationListener {
 	protected int transmitSpeed;
 	protected ConnectivityOptimizer optimizer = null;
 	/** scanning interval, or 0.0 if n/a */
-	private double scanInterval;
+	protected double scanInterval;
 	private double lastScanTime;
 
 	/** activeness handler for the node group */
@@ -153,7 +153,7 @@ abstract public class NetworkInterface implements ModuleCommunicationListener {
 			comBus.subscribe(RANGE_ID, this);
 			comBus.subscribe(SPEED_ID, this);
 		}
-
+		System.out.println("SETTING INTERFACE");
 		if (transmitRange > 0) {
 			optimizer = ConnectivityGrid.ConnectivityGridFactory(
 					this.interfacetype.hashCode(), transmitRange);

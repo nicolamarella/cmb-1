@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ConnectionSpeedReport extends SamplingReport implements UpdateListener {
 
@@ -81,7 +82,7 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
                 .filter(WifiNetworkInterface.class::isInstance)
                 .map(WifiNetworkInterface.class::cast)
                 .filter(WifiNetworkInterface::getIsAccessPoint)
-                .toList();
+                .collect(Collectors.toList());
         APInterfaces.forEach(APInterface -> {
                     List<Double> emptyList = new LinkedList<>();
                     averageAPSpeeds.put(APInterface, emptyList);

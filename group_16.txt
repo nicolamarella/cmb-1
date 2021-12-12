@@ -9,25 +9,27 @@ Events.nrof = 0
 
 # Communication Interfaces
 mobileInterface.type = WifiNetworkInterface
-mobileInterface.transmitRange = 1
+mobileInterface.transmitRange = 10
 mobileInterface.transmitSpeed = 30
 mobileInterface.transmitSpeeds = [1, 0.6, 0.3]
-mobileInterface.transmitPower = 5
 mobileInterface.isAccessPoint = false
 
 APInterface.type = WifiNetworkInterface
-APInterface.transmitRange = 5
+APInterface.transmitRange = 20
 APInterface.transmitSpeed = 75
 APInterface.transmitSpeeds = [1, 0.6, 0.3]
-APInterface.transmitPower = 15
 APInterface.isAccessPoint = true
+# Settings for APs
+APInterface.noiseMultiplier = 15
+APInterface.speedMultiplier = 100
 
 # Groups
-Scenario.nrofHostGroups = 2
+Scenario.nrofHostGroups = 4
+Scenario.simulateConnections = true
 
 Group1.groupID = x
 # nrofHosts is ignored when using TUMScheduleMovement 
-Group1.nrofHosts = 0
+Group1.nrofHosts = 1
 Group1.nrofInterfaces = 1
 Group1.interface1 = mobileInterface
 Group1.movementModel = TUMScheduleMovement 
@@ -53,8 +55,27 @@ Group2.nrofHosts = 1
 Group2.nrofInterfaces = 1
 Group2.interface1 = APInterface
 Group2.movementModel = StationaryMovement
-Group2.nodeLocation = 200,100
+Group2.nodeLocation = 150,100
 Group2.router = PassiveRouter
+
+# Group 3 = AP group
+Group3.groupID = AP2
+Group3.nrofHosts = 1
+Group3.nrofInterfaces = 1
+Group3.interface1 = APInterface
+Group3.movementModel = StationaryMovement
+Group3.nodeLocation = 100,100
+Group3.router = PassiveRouter
+
+# Group 4 = AP group
+Group4.groupID = AP3
+Group4.nrofHosts = 1
+Group4.nrofInterfaces = 1
+Group4.interface1 = APInterface
+Group4.movementModel = StationaryMovement
+Group4.nodeLocation = 125,100
+Group4.router = PassiveRouter
+
 
 # GUI underlay image settings
 GUI.UnderlayImage.fileName = data/fmi/cleaned/background.png

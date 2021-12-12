@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="DTNConsoleConnection">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/DTNConsoleConnection.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ECLA.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/junit-4.13.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opencsv-3.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

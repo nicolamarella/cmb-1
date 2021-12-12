@@ -4,6 +4,7 @@
  */
 package core;
 
+import interfaces.WifiNetworkInterface;
 import routing.MessageRouter;
 
 /**
@@ -67,14 +68,21 @@ public class VBRConnection extends Connection {
 	 *
 	 */
 	public void update() {
-		currentspeed =  this.fromInterface.getTransmitSpeed(toInterface);
-		int othspeed =  this.toInterface.getTransmitSpeed(fromInterface);
-		double now = core.SimClock.getTime();
 
-		if (othspeed < currentspeed) {
-			currentspeed = othspeed;
+		if(!(fromInterface instanceof WifiNetworkInterface &&
+				toInterface instanceof WifiNetworkInterface)) {
+			return;
 		}
 
+		if(((WifiNetworkInterface)this.fromInterface).getIsAccessPoint()){
+			currentspeed = this.fromInterface.getTransmitSpeed(this.toInterface);
+		} else if(((WifiNetworkInterface)this.toInterface).getIsAccessPoint()) {
+			currentspeed = this.toInterface.getTransmitSpeed(this.fromInterface);
+		} else {
+			return;
+		}
+
+		double now = core.SimClock.getTime();
 
 		msgsent += currentspeed * (now - this.lastUpdate);
 		this.lastUpdate = now;

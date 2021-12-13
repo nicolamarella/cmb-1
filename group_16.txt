@@ -1,3 +1,5 @@
+#STALE SETTINGS - DO NOT USE
+
 # Settings for map route based movement in a triangle.
 
 Scenario.name = MapRouteMovement

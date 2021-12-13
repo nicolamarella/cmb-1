@@ -1,42 +1,60 @@
 package report;
 
-import core.DTNHost;
-import core.UpdateListener;
+import core.*;
 import interfaces.WifiNetworkInterface;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/** Reports average connection speeds and connection ratios of nodes connected by {@link WifiNetworkInterface}.
+ * Splits up by specified time intervals and access points.**/
 public class ConnectionSpeedReport extends SamplingReport implements UpdateListener {
 
+    /** Interval in seconds between two report numbers ({@value}).
+     * Has to be equal to or higher than {@link #SAMPLE_INTERVAL_SETTING}.
+     * Ideally is a multiple of it. **/
+    public static final String REPORT_INTERVAL_SETTING = "reportInterval";
+    /** Default value for {@link #REPORT_INTERVAL_SETTING} ({@value} seconds). **/
+    public static final double DEFAULT_REPORT_INTERVAL = 1000;
+
+    private final double reportInterval;
     private boolean setupDone = false;
+    private double lastReport = 0;
+
+    //lists of access point and client node interfaces
     private List<WifiNetworkInterface> APInterfaces;
     private List<WifiNetworkInterface> clientInterfaces;
 
-    //averages as well as connection ratios calculated over all connected client nodes per time unit
+    //connection speed averages calculated over all connected client nodes per report interval
     private final HashMap<WifiNetworkInterface,List<Double>> averageAPSpeeds = new HashMap<>();
     private final List<Double> averageConnectionSpeeds = new LinkedList<>();
+
+    //connection ratios calculated over all client nodes per report interval
     private final List<Double> connectionRatios = new LinkedList<>();
 
     //connection speeds of all connected client nodes over the full simulation time
     private final HashMap<WifiNetworkInterface,List<Integer>> APSpeeds = new HashMap<>();
     private final List<Integer> connectionSpeeds = new LinkedList<>();
 
+    //values measured in the current report interval
+    private final HashMap<WifiNetworkInterface,List<Integer>> currentAPSpeeds = new HashMap<>();
+    private final List<Integer> currentConnectionSpeeds = new LinkedList<>();
+    private final AtomicInteger connectedCounter = new AtomicInteger();
+    private final AtomicInteger unconnectedCounter = new AtomicInteger();
+
+    public ConnectionSpeedReport() {
+        super();
+        reportInterval = getSettings().getDouble(REPORT_INTERVAL_SETTING, DEFAULT_REPORT_INTERVAL);
+        if (reportInterval < super.interval) {
+            throw new SettingsError("Setting '" + REPORT_INTERVAL_SETTING + "' must be higher than setting '"
+                    + SAMPLE_INTERVAL_SETTING + "'. Found " + this.reportInterval + ".");
+        }
+    }
+
     @Override
     public void sample(List<DTNHost> hosts) {
         if (!setupDone) setup(hosts);
-
-        HashMap<WifiNetworkInterface,List<Integer>> currentAPSpeeds = new HashMap<>();
-        List<Integer> currentConnectionSpeeds = new LinkedList<>();
-        AtomicInteger connectedCounter = new AtomicInteger();
-        AtomicInteger unconnectedCounter = new AtomicInteger();
-
-        APInterfaces.forEach(APInterface -> {
-            List<Integer> emptyList = new LinkedList<>();
-            currentAPSpeeds.put(APInterface, emptyList);
-        });
-
         clientInterfaces.forEach(clientInterface -> {
                     if (clientInterface.getConnections().size() == 0) {
                         unconnectedCounter.getAndIncrement();
@@ -52,11 +70,18 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
                     connectedCounter.getAndIncrement();
         });
 
+        //if the current report interval is over, averages are calculated for it and a new interval is started
+        if (SimClock.getTime() - lastReport <= reportInterval) return;
+        lastReport = SimClock.getTime();
         averageConnectionSpeeds.add(calculateIntAverage(currentConnectionSpeeds));
         connectionRatios.add((double) connectedCounter.get() / (connectedCounter.get() + unconnectedCounter.get()));
         for (WifiNetworkInterface in: APInterfaces) {
             averageAPSpeeds.get(in).add(calculateIntAverage(currentAPSpeeds.get(in)));
         }
+        APInterfaces.forEach(APInterface -> {
+            List<Integer> emptyList = new LinkedList<>();
+            currentAPSpeeds.put(APInterface, emptyList);
+        });
     }
 
     @Override
@@ -98,10 +123,12 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
                 .collect(Collectors.toList());
         APInterfaces.forEach(APInterface -> {
                     List<Double> emptyDoubleList = new LinkedList<>();
-                    List<Integer> emptyIntList = new LinkedList<>();
+                    List<Integer> emptyIntList0 = new LinkedList<>();
+                    List<Integer> emptyIntList1 = new LinkedList<>();
                     averageAPSpeeds.put(APInterface, emptyDoubleList);
-                    APSpeeds.put(APInterface, emptyIntList);
-                });
+                    APSpeeds.put(APInterface, emptyIntList0);
+                    currentAPSpeeds.put(APInterface, emptyIntList1);
+        });
         clientInterfaces = hosts.stream()
                 .map(i -> i.getInterface(1))
                 .filter(WifiNetworkInterface.class::isInstance)

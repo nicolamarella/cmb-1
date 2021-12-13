@@ -16,7 +16,7 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
      * Ideally is a multiple of it. **/
     public static final String REPORT_INTERVAL_SETTING = "reportInterval";
     /** Default value for {@link #REPORT_INTERVAL_SETTING} ({@value} seconds). **/
-    public static final double DEFAULT_REPORT_INTERVAL = 1000;
+    public static final double DEFAULT_REPORT_INTERVAL = 600;
 
     private final double reportInterval;
     private boolean setupDone = false;
@@ -87,28 +87,28 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
     @Override
     public void done() {
         init();
-        out.println("TOTAL AVERAGES:");
-        out.println("---------------");
-        out.println("Connection Ratio: " + format(calculateDoubleAverage(connectionRatios)));
-        out.println("Overall Average Connection Speed: " + format(calculateIntAverage(connectionSpeeds)));
+        out.println("TOTAL AVERAGES");
+        out.print("\n");
+        out.println("Connection Ratio;" + format(calculateDoubleAverage(connectionRatios)));
+        out.println("Overall Average Connection Speed;" + format(calculateIntAverage(connectionSpeeds)));
         for (WifiNetworkInterface in: APInterfaces) {
-            out.print(in.getHost().toString() + " Average Connection Speed: "
+            out.print(in.getHost().toString() + " Average Connection Speed;"
                     + format(calculateIntAverage(APSpeeds.get(in))));
             out.print("\n");
         }
         out.print("\n");
 
-        out.println("AVERAGES OVER TIME:");
-        out.println("-------------------");
-        out.print("Connection Ratios:                ");
-        connectionRatios.forEach(ratio -> out.print("\t" + format(ratio)));
+        out.println("AVERAGES OVER TIME");
         out.print("\n");
-        out.print("Overall Average Connection Speeds:");
-        averageConnectionSpeeds.forEach(speed -> out.print("\t" + format(speed) + " "));
+        out.print("Connection Ratios");
+        connectionRatios.forEach(ratio -> out.print(";" + format(ratio)));
+        out.print("\n");
+        out.print("Overall Average Connection Speeds");
+        averageConnectionSpeeds.forEach(speed -> out.print(";" + format(speed)));
         out.print("\n");
         for (WifiNetworkInterface in: APInterfaces) {
-            out.print(in.getHost().toString() + " Average Connection Speeds:");
-            averageAPSpeeds.get(in).forEach(speed -> out.print("\t" + format(speed) + " "));
+            out.print(in.getHost().toString() + " Average Connection Speeds");
+            averageAPSpeeds.get(in).forEach(speed -> out.print(";" + format(speed) + " "));
             out.print("\n");
         }
         super.done();

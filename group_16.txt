@@ -99,4 +99,5 @@ NodeDensityReport.outputGnuplot = true
 NodeDensityReport.onlyAverage = true
 
 Report.report2 = ConnectionSpeedReport
-ConnectionSpeedReport.sampleInterval = 500
+ConnectionSpeedReport.sampleInterval = 100
+ConnectionSpeedReport.precision = 2

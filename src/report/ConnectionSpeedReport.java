@@ -108,7 +108,7 @@ public class ConnectionSpeedReport extends SamplingReport implements UpdateListe
         out.print("\n");
         for (WifiNetworkInterface in: APInterfaces) {
             out.print(in.getHost().toString() + " Average Connection Speeds");
-            averageAPSpeeds.get(in).forEach(speed -> out.print(";" + format(speed) + " "));
+            averageAPSpeeds.get(in).forEach(speed -> out.print(";" + format(speed)));
             out.print("\n");
         }
         super.done();

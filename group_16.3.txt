@@ -1,0 +1,77 @@
+# also add Access Point Configuration from "accessPoints.txt"
+# Settings for map route based movement in a triangle.
+
+Scenario.name = MapRouteMovement
+Scenario.endTime = 36000
+Scenario.updateInterval = 2
+Scenario.simulateConnections = false
+MovementModel.worldSize = 500,500
+Events.nrof = 0
+
+# Communication Interfaces
+mobileInterface.type = WifiNetworkInterface
+mobileInterface.transmitRange = 20
+mobileInterface.transmitSpeed = 50
+mobileInterface.transmitSpeeds = [1, 0.9, 0.8, 0.6, 0.4]
+mobileInterface.isAccessPoint = false
+
+APInterface.type = WifiNetworkInterface
+APInterface.transmitRange = 20
+APInterface.transmitSpeed = 50
+APInterface.transmitSpeeds = [1, 0.9, 0.8, 0.6, 0.4]
+APInterface.isAccessPoint = true
+# Settings for APs
+APInterface.noiseMultiplier = 15
+APInterface.speedMultiplier = 100
+
+# Groups
+Scenario.nrofHostGroups = 14
+Scenario.simulateConnections = true
+
+Group1.groupID = x
+# nrofHosts is ignored when using TUMScheduleMovement
+Group1.nrofHosts = 1
+Group1.nrofInterfaces = 1
+Group1.interface1 = mobileInterface
+Group1.movementModel = TUMScheduleMovement
+Group1.router = PassiveRouter
+# Group1.pois = 1,1
+
+## Map based movement -movement model specific settings
+MapBasedMovement.nrofMapFiles = 1
+MapBasedMovement.mapFile1 = data/fmi/cleaned/fmi.wkt
+TUMScheduleMovement.startingPointsFile= data/fmi/cleaned/StartingPoints.wkt
+TUMScheduleMovement.roomsFile = data/fmi/cleaned/rooms.wkt
+TUMScheduleMovement.nonLecutrePointsFile = data/fmi/cleaned/NonLecturePoints.wkt
+
+# scheduler csv file
+TUMScheduler.scheduleCsvFile = data/fmi/fmi_schedule_tuesday.csv
+# Use second file for initial coordinates
+# PointsOfInterest.poiFile1 = data/fmi/cleaned/StartingPoints.wkt
+
+# GUI underlay image settings
+GUI.UnderlayImage.fileName = data/fmi/cleaned/background.png
+# Image offset in pixels (x, y)
+GUI.UnderlayImage.offset = -105,-60
+# Scaling factor for the image
+GUI.UnderlayImage.scale = 0.315
+# Image rotation (radians)
+GUI.UnderlayImage.rotate = 0.0
+
+# Reports
+
+Report.reportDir = reports
+Report.warmup = 400
+Report.nrofReports = 2
+
+Report.report1 = NodeDensityReport
+NodeDensityReport.xCount = 200
+NodeDensityReport.yCount = 200
+NodeDensityReport.outputGnuplot = true
+NodeDensityReport.onlyAverage = true
+NodeDensityReport.sampleInterval = 120
+
+Report.report2 = ConnectionSpeedReport
+ConnectionSpeedReport.sampleInterval = 120
+ConnectionSpeedReport.precision = 1
+ConnectionSpeedReport.reportInterval = 600

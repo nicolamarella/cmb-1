@@ -1,0 +1,116 @@
+# Group 2 = AP group
+Group2.groupID = AP
+Group2.nrofHosts = 1
+Group2.nrofInterfaces = 1
+Group2.interface1 = APInterface
+Group2.movementModel = StationaryMovement
+Group2.nodeLocation = 175,100
+Group2.router = PassiveRouter
+
+# Group 3 = AP group
+Group3.groupID = AP2
+Group3.nrofHosts = 1
+Group3.nrofInterfaces = 1
+Group3.interface1 = APInterface
+Group3.movementModel = StationaryMovement
+Group3.nodeLocation = 122,95
+Group3.router = PassiveRouter
+
+# Group 4 = AP group
+Group4.groupID = AP3
+Group4.nrofHosts = 1
+Group4.nrofInterfaces = 1
+Group4.interface1 = APInterface
+Group4.movementModel = StationaryMovement
+Group4.nodeLocation = 89,80
+Group4.router = PassiveRouter
+
+# Group 5 = AP group
+Group5.groupID = AP4
+Group5.nrofHosts = 1
+Group5.nrofInterfaces = 1
+Group5.interface1 = APInterface
+Group5.movementModel = StationaryMovement
+Group5.nodeLocation = 57,70
+Group5.router = PassiveRouter
+
+# Group 6 = AP group
+Group6.groupID = AP5
+Group6.nrofHosts = 1
+Group6.nrofInterfaces = 1
+Group6.interface1 = APInterface
+Group6.movementModel = StationaryMovement
+Group6.nodeLocation = 110,123
+Group6.router = PassiveRouter
+
+# Group 7 = AP group
+Group7.groupID = AP6
+Group7.nrofHosts = 1
+Group7.nrofInterfaces = 1
+Group7.interface1 = APInterface
+Group7.movementModel = StationaryMovement
+Group7.nodeLocation = 115,60
+Group7.router = PassiveRouter
+
+# Group 8 = AP group
+Group8.groupID = AP7
+Group8.nrofHosts = 1
+Group8.nrofInterfaces = 1
+Group8.interface1 = APInterface
+Group8.movementModel = StationaryMovement
+Group8.nodeLocation = 115,35
+Group8.router = PassiveRouter
+
+# Group 9 = AP group
+Group9.groupID = AP8
+Group9.nrofHosts = 1
+Group9.nrofInterfaces = 1
+Group9.interface1 = APInterface
+Group9.movementModel = StationaryMovement
+Group9.nodeLocation = 45,26
+Group9.router = PassiveRouter
+
+# Group 10 = AP group
+Group10.groupID = AP9
+Group10.nrofHosts = 1
+Group10.nrofInterfaces = 1
+Group10.interface1 = APInterface
+Group10.movementModel = StationaryMovement
+Group10.nodeLocation = 30,60
+Group10.router = PassiveRouter
+
+# Group 11 = AP group
+Group11.groupID = AP10
+Group11.nrofHosts = 1
+Group11.nrofInterfaces = 1
+Group11.interface1 = APInterface
+Group11.movementModel = StationaryMovement
+Group11.nodeLocation = 15,55
+Group11.router = PassiveRouter
+
+# Group 12 = AP group
+Group12.groupID = AP11
+Group12.nrofHosts = 1
+Group12.nrofInterfaces = 1
+Group12.interface1 = APInterface
+Group12.movementModel = StationaryMovement
+Group12.nodeLocation = 8,19
+Group12.router = PassiveRouter
+
+# Group 13 = AP group
+Group13.groupID = AP12
+Group13.nrofHosts = 1
+Group13.nrofInterfaces = 1
+Group13.interface1 = APInterface
+Group13.movementModel = StationaryMovement
+Group13.nodeLocation = 145,93
+Group13.router = PassiveRouter
+
+# Group 14 = AP group
+Group14.groupID = AP13
+Group14.nrofHosts = 1
+Group14.nrofInterfaces = 1
+Group14.interface1 = APInterface
+Group14.movementModel = StationaryMovement
+Group14.nodeLocation = 170,135
+Group14.router = PassiveRouter

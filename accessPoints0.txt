@@ -1,4 +1,6 @@
 # Group 2 = AP group
+Scenario.nrofHostGroups = 18
+
 Group2.groupID = AP
 Group2.nrofHosts = 1
 Group2.nrofInterfaces = 1
